@@ -1,0 +1,21 @@
+Package: bbsRDM
+Type: Package
+Title: Calculate regime detection metrics using bird communities
+Version: 0.1.0
+Author: Jessica Burnett
+Maintainer: Jessica Burnett <jessicaleighburnett@Gmail.com>
+Description: 
+    Calculates regime detection metrics using North American Breeding Bird Survey data using either time series or spatial transects. License: MIT +
+Encoding: UTF-8
+LazyData: true
+Depends:
+    usethis,
+    plyr,
+    dplyr, 
+    readr,
+    stringr, 
+    ggplot2, 
+    sp, 
+    raster
+Imports:
+    tictoc
