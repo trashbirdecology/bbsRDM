@@ -123,17 +123,17 @@ toc()}
 # I: Define parameters for calculating the metrics  -------------------------
 
 # # Option 1; Interactive inputs for parameters
-    # source(paste0(getwd(), '/R/interactCalcRDM.R'))
-
-# Option 2: Manually define parameters for regimeDetectionMeasures functions.
-    metrics.to.calc <- c("distances", "ews")
-    analySpatTemp <- "South-North" # choose one of : 'South-North', 'East-West', or 'temporal'
-    fill = 0
-    min.samp.sites = 15
-    min.window.dat = 3
-    fi.equation = "7.12"
-    winMove = 0.25
-    to.calc = c("EWS","FI","VI")
+    source(paste0(getwd(), '/interactCalcRDM.R'))
+  #
+# # Option 2: Manually define parameters for regimeDetectionMeasures functions.
+#     metrics.to.calc <- c("distances", "ews")
+#     analySpatTemp <- "South-North" # choose one of : 'South-North', 'East-West', or 'temporal'
+#     fill = 0
+#     min.samp.sites = 15
+#     min.window.dat = 3
+#     fi.equation = "7.12"
+#     winMove = 0.25
+#     to.calc = c("EWS","FI","VI")
 
 
 # II: Subset the data -----------------------------------------------------
