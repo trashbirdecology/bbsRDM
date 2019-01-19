@@ -25,11 +25,12 @@ library(tictoc)
 # a. Create a directory to store and/or load the BBS data as feathers
 dir.create(file.path(getwd(), paste0("/bbs_raw_data")))
 bbsDir <- paste0(getwd(), paste0("/bbs_raw_data/"))
-
+if(length(list.files(bbsDir))!=0){warning("The directory ", resultsDir, " already exists.. /nProceed with caution--files in this directory will likely be overwritten.")}
 
 # b. Create a directory to store and/or load the BBS data as feathers
 dir.create(file.path(getwd(), paste0("/myResults")))
 resultsDir <- paste0(getwd(), paste0("/myResults/"))
+    if(length(list.files(resultsDir))!=0){warning("The directory ", resultsDir, " already exists.. /nProceed with caution--files in this directory will likely be overwritten.")}
 
 
 # # I: OPTIONAL: Import BBS and save to disk as feathers -----------------------------------------------
