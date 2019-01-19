@@ -76,16 +76,16 @@ createSamplingGrid <- function(cs = c(0.5, 0.5), bbLat = c(51, 23) , bbLong =  c
 
   # This looks a little messy (columnnames) but for now leave it to match sp_grd
   rowcol_ID <-
-    cbind(
+      as.data.frame(cbind(
       ID = gather(as_tibble(row_m), value = "rowID")$rowID,
       colID = gather(as_tibble(col_m), value = "colID")$colID
-    ) %>%
-    as.data.frame()
+    ))
+
 
 
   # Append the row and column IDs to the sp_grd
   rowColID_sp_grid_ID <- cbind(sp_grd@data, rowcol_ID) %>%
-    rename(cellID = id,
+    dplyr::rename(cellID = id,
            rowID = ID) %>%
       as.data.frame()
 
@@ -102,7 +102,7 @@ createSamplingGrid <- function(cs = c(0.5, 0.5), bbLat = c(51, 23) , bbLong =  c
 
   # Need to force the SPDF to a data frame in order to merge them
   routeDF <- as_tibble(route_spdf) %>%
-    rename(long = longitude,
+    dplyr::rename(long = longitude,
            lat = latitude)
 
 
@@ -125,8 +125,8 @@ createSamplingGrid <- function(cs = c(0.5, 0.5), bbLat = c(51, 23) , bbLong =  c
 
   return(listOut)
 
-  # Detach package to avoid conflicts
-  detach("package:raster", unload = TRUE) # see bug: https://github.com/tidyverse/dplyr/issues/643
+  # # Detach package to avoid conflicts
+  # detach("package:raster", unload = TRUE) # see bug: https://github.com/tidyverse/dplyr/issues/643
 
   # End Function ------------------------------------------------------------
 }

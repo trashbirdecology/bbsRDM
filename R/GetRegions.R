@@ -112,12 +112,11 @@ GetRegions <- function(Dir ="ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFile
 
 
 
-
     RegionCodes <- RegionCodes %>%
-      rename(countryNum = countrynum,
+      dplyr::rename(countryNum = countrynum,
              regionCode = RegionCode,
              countryName = CountryName,
-             stateName = 'State/Prov/TerrName'
+             stateName = `State/Prov/TerrName`
       )
 
     RegionCodes

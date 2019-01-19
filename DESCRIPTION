@@ -9,8 +9,6 @@ Description:
 Encoding: UTF-8
 LazyData: true
 Depends:
-    usethis,
-    plyr,
     dplyr, 
     readr,
     stringr, 

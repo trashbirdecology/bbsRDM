@@ -54,7 +54,7 @@ importDataBBS <- function(
     bbsData <-
       getDataBBS(file = file,
                  dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",
-                 year = 2010,
+                 year = NULL,
                  aou = NULL,
                  countrynum = NULL,
                  states = NULL
