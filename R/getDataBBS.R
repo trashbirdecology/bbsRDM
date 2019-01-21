@@ -9,6 +9,13 @@
 #' @param states Vector of state names Default = NULL (all states).
 #' @exports
 #'
+#' @return If download successful, a dataframe with the results.
+#'
+#' @examples
+#' # download all species and years from Nebraska.
+#' \dontrun{
+#' getDataBBS(file = "nebraska.zip")
+#' }
 #'
 getDataBBS <- function(file = file,
                        dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",

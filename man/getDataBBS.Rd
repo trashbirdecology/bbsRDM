@@ -21,6 +21,16 @@ getDataBBS(file = file,
 
 \item{states}{Vector of state names Default = NULL (all states).}
 }
+\value{
+If download successful, a dataframe with the results.
+}
 \description{
 This function was adapted from **oharar/rBBS** package.
+}
+\examples{
+# download all species and years from Nebraska.
+\dontrun{
+getDataBBS(file = "nebraska.zip")
+}
+
 }
