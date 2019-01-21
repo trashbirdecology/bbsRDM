@@ -1,5 +1,5 @@
 # getDataBBS ##########################################################
-#' @title
+#' @title Download USGS Breeding Bird Survey data
 #' @description This function was adapted from **oharar/rBBS** package.
 #' @param file One file names ("stateX.zip"). Preferably download a single state at a time, otherwise run time will take >1 minutes.
 #' @param dir URL to the StatesFiles.
@@ -7,7 +7,7 @@
 #' @param aou Vector of AOU #s Default = NULL (all species).
 #' @param countrynum Vector of country ID #'s. Default = NULL (all countryNums).
 #' @param states Vector of state names Default = NULL (all states).
-#' @exports getDataBBS
+#' @exports
 #'
 #'
 getDataBBS <- function(file = file,
