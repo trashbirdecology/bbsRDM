@@ -17,3 +17,4 @@ Depends:
     raster
 Imports:
     tictoc
+RoxygenNote: 6.0.1
