@@ -1,6 +1,6 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "A simple run through of RDM with BBS data"
+author: "Jessica Burnett"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
@@ -14,52 +14,90 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+There are a lot of dependencies to load here.
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+```{r , message=FALSE, warning = FALSE}
+## Re-install often as this package is under major development.
+devtools::install_github("trashbirdecology/regimedetectionmeasures", force = T)
+library(regimeDetectionMeasures)
+library(sp)
+library(raster)
+library(feather)
+library(bbsRDM)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+First we need to create some directories to hold the intermediate data.
+```{r}
+# a. Create a directory to store and/or load the BBS data as feathers
+bbsDir <- here::here("bbs_raw_data")
+dir.create(bbsDir)
+# if this returns a warning, proceed with caution as directory already exists
+# and may contain results.
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+# b. Create a directory to store and/or load the BBS data as feathers
+resultsDir <- here::here("myResults")
+dir.create(resultsDir)
+# ditto
 ```
 
-Also a quote using `>`:
+If necessary, download all the state data. This takes 10-15 minutes, so don't do
+this more than once if possible!
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+```{r , eval = FALSE}
+# o. Load the regional .txt file from Patuxent
+regions <- GetRegions()
+# Create a series or one filenames for states, regions
+regionFileName <- regions$zipFileName %>% na.omit()
+# a.  Download and unzip the BBS data.
+for(i in 1:length(regionFileName)){
+        bbsData <-  importDataBBS(
+            # arguments for getDataBBS()
+            file = regionFileName[i],
+            dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",
+            year = NULL,
+            aou = NULL,
+            countrynum = NULL,
+            states = NULL,
+            #  arguments for getRouteInfo():
+            routesFile = "routes.zip",
+            routesDir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
+            RouteTypeID = 1,
+            # one or more of c(1,2,3)
+            Stratum = NULL,
+            BCR = NULL
+        )
+
+
+# b. Save the file to disk
+birdsToFeathers(dataIn  = bbsData,
+                newDir  = bbsDir,
+                filename = regionFileName[i])
+
+rm(bbsData)
+
+} # end section I. loop
+
+```
+
+Next we build the sampling grid to force route information onto a regular grid.
+
+```{r}
+# III: Build sampling grid --------------------------------------------------------
+# Define the grid's cell size (lat, long; unit:degrees)
+# 1 deg latitude ~= 69 miles
+# 1 deg longitude ~= 55 miles
+cs <-
+    c(0.5, 0.5)  # default is cell size 0.5 deg lat x 0.5 deg long
+
+# Create the grid
+routes_gridList <- createSamplingGrid(cs = cs)
+routes_grid <- routes_gridList$routes_grid
+sp_grd <- routes_gridList$sp_grd
+
+rm(cs)
+
+```
+
