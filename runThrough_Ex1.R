@@ -7,6 +7,7 @@ rm(list = ls())
 ###PART I: Setup ##########################################
 # 1: Load packages -------------------------------------------------------
 
+
 ## Re-install often as this package is under major development.
 devtools::install_github("trashbirdecology/regimedetectionmeasures", force = T)
 library(regimeDetectionMeasures)
