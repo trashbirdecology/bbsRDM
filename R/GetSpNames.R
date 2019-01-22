@@ -1,5 +1,9 @@
 # Read in list of species names, from SpeciesList.txt, and then extract list of where the data is kept
-#' @export GetSpNames
+#' @title Download species names
+#' @description Read in list of species names, from SpeciesList.txt, and then extract list of where the data is kept
+#' @param Dir ftp URL for directory with data files
+#' @return A dataframe
+#' @export
 GetSpNames <- function(Dir="ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/") {
   File <- paste0(Dir, "SpeciesList.txt")
 

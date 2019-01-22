@@ -1,5 +1,5 @@
 # importDataBBS ##########################################################
-#' @title
+#' @title Download and merge all the count, route, and species information
 #' @description This function was adapted from **oharar/rBBS** package.
 #' @param dir http:// pr ftp:/ link to bbs data location (here: state files)
 #' @param zipFileNames One or more file names ("state.zip"), char vector. Preferably download a single state at a time, otherwise run time will take >1 minutes.
@@ -9,12 +9,13 @@
 #' @param year Vector of years. Default = NULL (all years).
 #' @param states Vector of state names Default = NULL (all states).
 #' @param regions Vector of regionCodes. Default = NULL (all regions).
-#' #' @param routeDir Location of the routes.zip folder Should be in DatFiles folder (default).
+#' @param routeDir Location of the routes.zip folder Should be in DatFiles folder (default).
 #' @param routeFile Name of the route information file. Usually "routes.zip".
 #' @param RouteTypeID One or more numbers indicating route substrate (1=roadside;2=water;3=off-road; Default = 1, roadside only).
 #' @param Stratum A vector of BBS physiographic stratum codes by which to filter the routes.
 #' @param BCR A vector of Bird Conservation Region codes where by which to filter the routes.
-#' @exports GetUnzip
+#' @return A dataframe
+#' @export
 #'
 #'
 
