@@ -1,7 +1,7 @@
 # getDataBBS ##########################################################
 #' @title Download USGS Breeding Bird Survey data
 #' @description This function was adapted from **oharar/rBBS** package.
-#' @param file One file names ("stateX.zip"). Preferably download a single state at a time, otherwise run time will take >1 minutes.
+#' @param file One file name including the .zip extension ("stateX.zip"). Preferably download a single state at a time, otherwise run time will take >1 minutes.
 #' @param dir URL to the StatesFiles.
 #' @param year Vector of years. Default = NULL (all years).
 #' @param aou Vector of AOU #s Default = NULL (all species).
