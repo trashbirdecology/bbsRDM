@@ -121,3 +121,74 @@ for (i in 1:length(featherNames)) {
 }
 ```
 
+Nearly there! Now we define the parameters for the regime shift detectors.
+
+```{r}
+metrics.to.calc <- c("distances", "ews")
+analySpatTemp <-
+    "South-North" # choose one of : 'South-North', 'East-West', or 'temporal'
+fill = 0
+min.samp.sites = 15
+min.window.dat = 3
+fi.equation = "7.12"
+winMove = 0.25
+to.calc = c("EWS", "FI", "VI")
+
+# II: Create a dataset for analysis -----------------------------------------------------
+
+# a. Subset the data according to year, colID, rowID, state, country, etc.
+birdData <- feathers %>%
+    filter(year == 2015,
+           colID == 81) %>% 
+            # rowID == 14
+            # statenum == 2,
+            # route == 14) %>%
+dplyr::rename(variable = aou,
+              value = stoptotal)
+
+# b. Munge the data further
+    dataIn <- birdData %>%
+        dplyr::rename(time = lat) %>%
+        dplyr::select(-year, -long)
+    timeVar = 'lat'
+    colInd = unique(birdData$colID)
+    yearInd = unique(birdData$year)
+    if(length(colInd)!=1){stop("dataIn is incorrect: check filtering.")}
+
+# III. Calculate the metrics ---------------------------------------------------
+
+    # keep only the relevant columns
+    dataInDist  <- dataIn %>%
+        dplyr::select(
+            time, variable, value)
+
+    # Calc distances
+    results_distance <- calculate_distanceTravelled(dataInDist, derivs = T) %>%
+        gather(key = 'metricType', value ='metricValue', -time)
+
+    rm(dataInDist)
+
+# f.ii.a Calculate the EWSs
+    # keep only the relevant columns
+    dataInRDM  <- dataIn %>%
+        dplyr::select(
+            time, variable, value)
+
+    if(length(unique(dataInRDM$time)) < min.samp.sites){stop("data has less observations than min.samp.sites")}
+
+    results_ews <-
+        rdm_window_analysis(
+            dataIn = dataInRDM,
+            winMove = winMove,
+            overrideSiteErr = F,
+            fi.equation = fi.equation,
+            min.window.dat = min.window.dat,
+            fill = fill,
+            to.calc = to.calc)
+
+    rm(dataInRDM)
+
+```
+
+And now we're ready to visualize!
+
