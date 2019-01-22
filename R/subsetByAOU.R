@@ -1,36 +1,34 @@
 #' @param myData A data frame including the column "aou".
-#' @param subset.by One or more of  c("keep.diurnal", 'remove.fowl', "remove.shorebirds", "keep.passerines", 'remove.shoreWaderFowl'). This function will
+#' @param subset.by One or more of   c("keep.diurnal", 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl').
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
 #' @export subsetByAOU
 
 
-subsetByAOU <- function(myData, subset.by = c("keep.diurnal", 'remove.fowl', "remove.shorebirds", "keep.passerines", 'remove.shoreWaderFowl')){
-    # subset.by = c("diurnal", "no ducks/geese", "no shore/wader/fowl", "passerines")
+subsetByAOU <- function(myData, subset.by = c("keep.diurnal", 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl')){
+    # subset.by =c("keep.diurnal", 'remove.fowl', "remove.shorebirds", "  'remove.shoreWaderFowl')
 
-    gc()
-    if(subset.by == "keep.diurnal"){
-        myData <- myData %>%
-    }
 
-    if(subset.by == "remove.fowl"){
-        myData <- myData %>%
-            filter(!aou %in% c(1290:1780))
-    }
 
-    if(subset.by == "remove.shorebirds"){
+ #    if("keep.diurnal" %in% subset.by){
+ #        myData <- myData %>%
+ # ## HERE-- need to add species codes for owls. nightjars, etc.
+ #    }
+
+    if("remove.fowl" %in% subset.by){
         myData <- myData %>%
             filter(!aou %in% c(1290:1780))
     }
 
-    if(subset.by == "remove.shoreWaderFowl"){
+    if( "remove.shorebirds" %in% subset.by){
+        myData <- myData %>%
+            filter(!aou %in% c(1290:1780))
+    }
+
+    if("remove.shoreWaderFowl" %in% subset.by){
         myData <- myData %>%
             filter(!aou %in% c(0000:2880))
     }
 
-    if(subset.by == "keep.passerines"){
-        myData <- myData %>%
-            filter(order %in% c("Passeriformes"))
-    }
 
     return(myData)
 
