@@ -7,14 +7,15 @@
 #' @param aou Vector of AOU #s Default = NULL (all species).
 #' @param countrynum Vector of country ID #'s. Default = NULL (all countryNums).
 #' @param states Vector of state names Default = NULL (all states).
-#' @exports
+#' @export
 #'
 #' @return If download successful, a dataframe with the results.
 #'
 #' @examples
 #' # download all species and years from Nebraska.
+#'
 #' \dontrun{
-#' getDataBBS(file = "nebraska.zip")
+#' NE <- getDataBBS(file = "Nebrask.zip")
 #' }
 #'
 getDataBBS <- function(file = file,

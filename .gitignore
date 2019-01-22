@@ -1,2 +1,5 @@
-packrat/lib*/
 .Rproj.user
+.Rhistory
+bbs_raw_data
+myResults
+

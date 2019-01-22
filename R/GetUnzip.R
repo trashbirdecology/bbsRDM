@@ -1,10 +1,10 @@
-
 # GetUnzip #########################################################
-#' @details
-#' @description
-#' @param ZipName
-#' @param FileName
-#' @exports GetUnzip
+#' @title Downloads and unzips a zip archive
+#' @param ZipName file to download
+#' @param FileName file to unzip to
+#' @details Used internally. If ZipName begins with 'http' or 'ftp', then download and unzip to
+#'   Filename and return as a dataframe. Otherwise, unzip Zipname and return as a data.frame.
+#' @return A dataframe
 
 GetUnzip <- function(ZipName, FileName) {
     if (grepl('^[hf]t+p', ZipName)) {

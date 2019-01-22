@@ -29,8 +29,9 @@ This function was adapted from **oharar/rBBS** package.
 }
 \examples{
 # download all species and years from Nebraska.
+
 \dontrun{
-getDataBBS(file = "nebraska.zip")
+NE <- getDataBBS(file = "Nebrask.zip")
 }
 
 }

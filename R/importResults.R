@@ -1,9 +1,11 @@
 # importResults #########################################################
-#' @details Load the regime detection metric results (.feathers)
-#' @description
+#' @title Load the regime detection metric results (.feathers)
 #' @param resultsDir Where the results are stored.
 #' @param myPattern Pattern for loading results files. One of "distance", "ews".
-#' @exports importResults
+#' @details Used after running calculate_distanceTravelled()? to make results available
+#'   for visualization?
+#' @return A dataframe
+#' @export
 
 importResults <- function(resultsDir, myPattern) {
     results <- NULL
