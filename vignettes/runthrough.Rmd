@@ -101,3 +101,23 @@ rm(cs)
 
 ```
 
+Now we load in the BBS data from the feathers and overlay the sampling grid. This takes
+a bit, and creates a pretty large object if memory is an issue.
+
+```{r, message=FALSE}
+feathers <- NULL
+featherNames <- list.files(bbsDir)
+featherNames <- str_c("/",featherNames) #add separator
+for (i in 1:length(featherNames)) {
+  feather <- NULL
+  feather <- loadBirdFeathers(newDir  = bbsDir,
+                              filename = featherNames[i]) %>%
+    dplyr::rename(lat = latitude,
+                  long = longitude) %>%
+    left_join(routes_grid, by = c("countrynum", "statenum", "route", "lat", "long"))
+  
+  feathers <- rbind(feathers, feather)
+  rm(feather)
+}
+```
+
