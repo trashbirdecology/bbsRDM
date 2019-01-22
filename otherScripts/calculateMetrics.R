@@ -1,4 +1,5 @@
 
+
 # a. Create an empty list for storing the results
 resultsList <- list()
 
@@ -30,9 +31,12 @@ if ("ews" %in% metrics.to.calc) {
     # keep only the relevant columns
     dataInRDM  <- dataIn %>%
         dplyr::select(
-            time, variable, value)
+            time, variable, value) %>%
+        group_by(time, variable) %>%
+        summarise(value = sum(value)) %>%
+        ungroup()
 
-    if(length(unique(dataInRDM$time)) < min.samp.sites){stop("data has less observations than min.samp.sites")}
+    if(!length(unique(dataInRDM$time)) < min.samp.sites){
 
     results <- NULL
     results <-
@@ -50,6 +54,8 @@ if ("ews" %in% metrics.to.calc) {
     rm(dataInRDM)
 
     saveMyResults(resultsList$ews ,resultsDir =resultsDir, analySpatTemp =analySpatTemp, metricInd = metricInd)
+
+    }else(print(paste0("# data points < min.samp.sites... skipping loop ", i)))
 
 } # END EWS calcs
 
