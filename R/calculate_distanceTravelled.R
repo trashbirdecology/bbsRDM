@@ -18,6 +18,7 @@ calculate_distanceTravelled <- function(dataIn, derivs = T, print = T) {
     mutate(ds = sqrt(sum(dx ^ 2))) %>%
     ungroup() %>%
     distinct(time,  ds) %>%
+    arrange(time) %>%
     mutate(s = cumsum(ds)) %>%
         ungroup()
 
