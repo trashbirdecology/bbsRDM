@@ -9,7 +9,7 @@ getDataBBS(file = file,
   year = NULL, aou = NULL, countrynum = NULL, states = NULL)
 }
 \arguments{
-\item{file}{One file names ("stateX.zip"). Preferably download a single state at a time, otherwise run time will take >1 minutes.}
+\item{file}{One file name including the .zip extension ("stateX.zip"). Preferably download a single state at a time, otherwise run time will take >1 minutes.}
 
 \item{dir}{URL to the StatesFiles.}
 
