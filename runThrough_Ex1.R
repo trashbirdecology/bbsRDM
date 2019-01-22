@@ -1,6 +1,6 @@
 rm(list = ls())
-###PART I: Setup ##########################################
-# 1: Load packages -------------------------------------------------------
+#################PART I: SETUP #####################################################################
+# I:   Load packages -------------------------------------------------------
 
 
 ## Re-install often as this package is under major development.
@@ -13,7 +13,7 @@ library(bbsRDM)
 # devtools::install_github("collectivemedia/tictoc", force = F)  # Optional but must silence tic()s and toc()s in following lines
 library(tictoc)
 
-# 0: Directories   ---------------------------------------------------
+# II:  Directories   ---------------------------------------------------
 
 # a. Create a directory to store and/or load the BBS data as feathers
 dir.create(file.path(getwd(), paste0("/bbs_raw_data")))
@@ -38,57 +38,51 @@ if (length(list.files(resultsDir)) != 0) {
 }
 
 
-# # I: OPTIONAL: Import BBS and save to disk as feathers -----------------------------------------------
-# #FYI:  ~10-15 MINUTES TO DOWNLOAD ALL STATE FILES FOR ALL YEARS!
-
-# # o. Load the regional .txt file from Patuxent
-# regions <- GetRegions()
-# # Create a series or one filenames for states, regions
+# # III: OPTIONAL IF DATA ALREADY DOWNLOADED: Import BBS and save to disk as feathers -----------------------------------------------
+# ##FYI:  ~10-15 MINUTES TO DOWNLOAD ALL STATE FILES FOR ALL YEARS!
+#
+# # a. Load the regional (list of states, regions) .txt file from Patuxent
+# regions <- getRegions()
+#
+# # b. Create a series or one filenames for states, regions
 # regionFileName <- regions$zipFileName %>% na.omit()
-# # a.  Download and unzip the BBS data.
-#  tic("Import and save bbs data from ftp")
-# for(i in 1:length(regionFileName)){
-#         bbsData <-  importDataBBS(
-#             # arguments for getDataBBS()
-#             file = regionFileName[i],
-#             dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",
-#             year = NULL,
-#             aou = NULL,
-#             countrynum = NULL,
-#             states = NULL,
-#             #  arguments for getRouteInfo():
-#             routesFile = "routes.zip",
-#             routesDir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
-#             RouteTypeID = 1,
-#             # one or more of c(1,2,3)
-#             Stratum = NULL,
-#             BCR = NULL
-#         )
+#
+# # c.  Download and unzip the BBS data.
+# tic("Import and save bbs data from ftp")
+# for (i in 1:length(regionFileName)) {
+#     bbsData <-  importDataBBS(
+#         # arguments for getDataBBS()
+#         file = regionFileName[i],
+#         dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",
+#         year = NULL,
+#         aou = NULL,
+#         countrynum = NULL,
+#         states = NULL,
+#         #  arguments for getRouteInfo():
+#         routesFile = "routes.zip",
+#         routesDir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
+#         RouteTypeID = 1,
+#         # one or more of c(1,2,3)
+#         Stratum = NULL,
+#         BCR = NULL
+#     )
 #
 #
-# # b. Save the file to disk
-# birdsToFeathers(dataIn  = bbsData,
-#                 newDir  = bbsDir,
-#                 filename = regionFileName[i])
 #
-# rm(bbsData)
+#     # c. Save the file to disk
+#     birdsToFeathers(dataIn  = bbsData,
+#                     newDir  = bbsDir,
+#                     filename = regionFileName[i])
 #
-# } # end section I. loop
+#     rm(bbsData)
+#
+# } # end section BBS unzip and save loop
 # toc()
 #
-
-# # II: OPTIONAL: Subset by the functional traits and body mass data ----------------------
 #
-# ## a. Functional traits and body mass data (unfortunately these data should be  saved to disk prior to analysis)
-# feather <- loadBirdFeathers(newDir  = bbsDir,
-#                                  filename = regionFileName)
 #
-# funMass <- funcMass(dataWD = paste0(getwd(), "/data"), fxn = T, mass = F)
-#
-# funMassBirds <- mergeFunMassBBS(bbsData = feather, funMass = funMass); rm(funMass)
-#
-
-# III: Build sampling grid --------------------------------------------------------
+################# PART II: CREATE SAMPLING GRID USING BBS ROUTES ########################################
+# IV:  Build a spatial sampling grid --------------------------------------------------------
 # Define the grid's cell size (lat, long; unit:degrees)
 # 1 deg latitude ~= 69 miles
 # 1 deg longitude ~= 55 miles
@@ -98,40 +92,68 @@ cs <-
 # Create the grid
 routes_gridList <- createSamplingGrid(cs = cs)
 routes_grid <- routes_gridList$routes_grid
-sp_grd <- routes_gridList$sp_grd
-
-rm(cs)
+sp_grd <- routes_gridList$sp_grd; rm(cs)
 
 
+# V:   Load BBS data and overlay the sampling grid ----------------------------------
 
-# IV: Load BBS data and overlay the sampling grid ----------------------------------
+### Load all the feathers in bbsDir, munge, and rbind
+### FYI: ~ 1/2 minutes to upload ALL BBS DATA; ~350MB as feather object
 
-## Load all the feathers in bbsDir, munge, and rbind
-# FYI: ~ 1/2 minutes to upload ALL BBS DATA; ~350MB as feather object
 feathers <- NULL
-    tic("Import feathers (BBS data)")
-    for (i in 1:length(list.files(bbsDir))) {
-        feather <- NULL
-        feather <- loadBirdFeathers(newDir  = bbsDir,
-                                    filename = list.files(bbsDir)[i]) %>%
-            dplyr::rename(lat = latitude,
-                          long = longitude) %>%
-            left_join(routes_grid)
+tic("Import feathers (BBS data)")
+for (i in 1:length(list.files(bbsDir))) {
+    feather <- NULL
+    feather <- loadBirdFeathers(newDir  = bbsDir,
+                                filename = list.files(bbsDir)[i]) %>%
+        dplyr::rename(lat = latitude,
+                      long = longitude) %>%
+        left_join(routes_grid) # join bbs data with the spatial samling grid
 
-        feathers <- rbind(feathers, feather)
-        rm(feather)
-    }
-    print(object.size(feathers), units = "auto")
-    toc()
+    feathers <- rbind(feathers, feather)
+    rm(feather)
+}
+print(object.size(feathers), units = "auto")
+toc()
 
 
-### PART II: CALCULATE THE METRICS ##########################################
-# I: Define parameters for calculating the metrics  -------------------------
+################ PART III: SUBSET THE SPECIES DATA ######################################################
+    ### This section is optional, however, we do not recommend using all raw bbs data.
+    ### Two choices here:
+        ### Section VI:  Subsets by specific functional traits and/or body masses. More tedious than VII.
+        ### Section VII: Subset by larger groups of species according to AOU code #s.
+
+ print("This is the data we will work with hereafter."); head(feathers)
+
+# # VI: OPTIONAL Subset by the functional traits and body mass data ----------------------
+#
+#
+# # Load the functional trait and mass data, and munge/merge
+# funMass <-
+#     funcMass(dataWD = paste0(getwd(), "/data"),
+#              fxn = T,
+#              mass = F)
+#
+# # Combine the two datasets
+# bbsData <-
+#     mergeFunMassBBS(bbsData = feather, funMass = funMass)
+# rm(funMass)
+# rm(funMass, feather)
+#
+#
+# VII:  Subset by AOU codes ------------------------------------------------
+
+feathers <- subsetByAOU(myData = feathers)
+
+
+################ PART IV: CALCULATE THE METRICS #########################################################
+# VIII: Define parameters for calculating the metrics  -------------------------
 
 # # Option 1; Interactive inputs for parameters
-source(paste0(getwd(), '/otherScripts/interactCalcRDM.R'))
-#
-# # Option 2: Manually define parameters for regimeDetectionMeasures functions.
+# source(paste0(getwd(), '/otherScripts/interactCalcRDM.R'))
+
+
+# Option 2: Manually define parameters for regimeDetectionMeasures functions.
 metrics.to.calc <- c("distances", "ews")
 analySpatTemp <-
     "South-North" # choose one of : 'South-North', 'East-West', or 'temporal'
@@ -142,44 +164,51 @@ fi.equation = "7.12"
 winMove = 0.25
 to.calc = c("EWS", "FI", "VI")
 
-# II: Create a dataset for analysis -----------------------------------------------------
+# VIX:  Create a dataset for analysis -----------------------------------------------------
+
+years.use = unique(feathers$year)
+for(i in 1:length(years.use)){
 
 # a. Subset the data according to year, colID, rowID, state, country, etc.
 birdData <- feathers %>%
-    filter(year == 2015,
-           colID == 81)
-            # rowID == 14
-            # statenum == 2,
-            # route == 14) %>%
+    filter(year == years.use[i],
+           colID == 81) %>%
+# rowID == 14
+# statenum == 2,
+# route == 14) %>%
 dplyr::rename(variable = aou,
               value = stoptotal)
 
 # b. Munge the data further
 source(paste0(getwd(), "/otherScripts/mungeSubsetData.R"))
+    # This script will produce a dataset called `dataIn`, and will fill paramters for labeling.
 
-
-# III. Calculate the metrics ---------------------------------------------------
+# X.   Calculate the metrics ---------------------------------------------------
 
 ## This script will run the analysis and write the results to file (in subdirectory 'myResults') as .feather files.
 source(paste0(getwd(), "/otherScripts/calculateMetrics.R"))
 
+}
 
-
-
-# IV. Load the results --------------------------------------------------------
+# XI. Load the results --------------------------------------------------------
 
 # a. check out the files in your results subdirectory.
 list.files(resultsDir)
-print(paste0("Are you sure you want to use ALL of these results?", "Does ",
-             length(list.files(resultsDir))
-             ," files sound right?!"))
+print(
+    paste0(
+        "Are you sure you want to use ALL of these results?",
+        " Does ",
+        length(list.files(resultsDir))
+        ,
+        " files sound right?!"
+    )
+)
 
 
 # b. Import EWS results
 results_EWS <-
     importResults(resultsDir = resultsDir, myPattern = 'ews')
-    ## FYI: varible should be missing (NA) for metricTypes fi and VI
-
+## FYI: varible should be missing (NA) for metricTypes fi and VI
 
 
 # c. Import distance results
@@ -187,7 +216,7 @@ results_dist <-
     importResults(resultsDir = resultsDir, myPattern = 'distance')
 
 
-
-# V. Visualize results ----------------------------------------------------
-
+# d. Join the results
+################ PART V: VISUALIZE THE METRICS  #########################################################
+# X. Visualize results ----------------------------------------------------
 
