@@ -29,3 +29,13 @@ if(analySpatTemp == "South-North"){
     if(length(colInd)!=1){stop("dataIn is incorrect: check filtering.")}
 }
 
+
+dataIn <- dataIn %>%
+    dplyr::select(
+        time, variable, value) %>%
+    # need to arrange by time to make sure the distances are calculated correctly!
+    dplyr::group_by(variable, time) %>%
+    summarise(value = sum(value)) %>%
+    dplyr::group_by(variable) %>%
+    arrange(variable, time) %>%
+    ungroup()
