@@ -6,6 +6,7 @@ rm(list = ls())
 ##
 ###PART I: Setup ##########################################
 # 1: Load packages -------------------------------------------------------
+packrat::disable(project = NULL, restart = TRUE)
 
 ## Re-install often as this package is under major development.
 devtools::install_github("trashbirdecology/regimedetectionmeasures", force = T)
