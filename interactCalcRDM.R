@@ -63,8 +63,8 @@ if("ews" %in% metrics.to.calc){
 {print('The following are decisions controlling `regimeDetectionMetrics()` pkg functions')}
     ## i. for "rdm_window_analysis()"
     min.samp.sites <-
-        readline(prompt = "Minimum # (integer) of observations within a moving window?
-                 **If NA or NULL, will default to 2**
+        readline(prompt = "Minimum # (integer) of observations comprising the entire time series??
+                 **I like 15... **
                  ") %>% as.numeric()
     ## ii. winMove: % of data by which window moves
     winMove <-
@@ -74,6 +74,11 @@ if("ews" %in% metrics.to.calc){
     if(is.null(winMove)){winMove <- 0.25}
     if(!is.null(winMove) & (winMove > 1 | winMove <0) ){readline(prompt = "Incorrect parameter. Please enter a NUMBER BETWEEN ZERO AND ONE!?
                  Enter a number between 0 and 1") %>% as.numeric()}
+    ## iii. for min.window.
+    min.window.dat <-
+        readline(prompt = "Minimum # (integer) of observations within a moving window?
+                 **Will default to 2... **
+                 ") %>% as.numeric()
 
 # d1. Calc rdm
  to.calc <-
