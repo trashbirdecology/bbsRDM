@@ -17,4 +17,3 @@ loadBirdFeathers <- function(newDir, filename) {
 }
 
 
-
