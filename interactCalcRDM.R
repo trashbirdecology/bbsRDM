@@ -40,8 +40,6 @@ Ex: if using count data and missing data are absences, use 0 (zero; this fill do
                                ...can be numeric or character...")}}
 
 # d. Parameters for 'regimeDetectionMeasures()'
-
-
 metrics.to.calc <-  readline(prompt = "Which metrics do you want to calculate?
         Type '1' for early-warning signals
         Type '2' for distance travelled
@@ -60,7 +58,7 @@ while(metrics.to.calc != 1 &
 # for calculating early-warning signals only
 if("ews" %in% metrics.to.calc){
 
-{print('The following are decisions controlling `()` pkg functions')
+{print('The following are decisions controlling `regimeDetectionMetrics()` pkg functions')}
     ## i. for "rdm_window_analysis()"
     min.samp.sites <-
         readline(prompt = "Minimum # (integer) of observations within a moving window?
@@ -69,13 +67,11 @@ if("ews" %in% metrics.to.calc){
     ## ii. winMove: % of data by which window moves
     winMove <-
         readline(prompt = "Proportion of the entire dataset by which each window will move?
-                 Enter a number between 0 and 1
+                 Enter a number between 0 and 1 (I like to start with 0.25...s)
                  ") %>% as.numeric()
     if(is.null(winMove)){winMove <- 0.25}
     if(!is.null(winMove) & (winMove > 1 | winMove <0) ){readline(prompt = "Incorrect parameter. Please enter a NUMBER BETWEEN ZERO AND ONE!?
-                 Enter a number between 0 and 1") %>% as.numeric()
-    }
-}
+                 Enter a number between 0 and 1") %>% as.numeric()}
 
 # d1. Calc rdm
  to.calc <-
@@ -85,7 +81,7 @@ if("ews" %in% metrics.to.calc){
            3: Early-warning signals (EWS)
            4: All
               ") %>% as.integer()
-    suppressWarnings(while(fi.equation!=1 & fi.equation!=2 & fi.equation!=3 &fi.equation!=4 ) {
+    suppressWarnings(while(to.calc!=1 & to.calc!=2 & to.calc!=3 & to.calc!=4 ) {
         fi.equation <- readline("Please enter a number 1-4!") %>% as.integer
     })
             if(to.calc == 4){to.calc=c(c("EWS","FI","VI"))}
