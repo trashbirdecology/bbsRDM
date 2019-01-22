@@ -20,14 +20,16 @@ list = NULL
         readline(prompt = "Do you want to run a spatial or temporal analysis?
                  Type '1' for spatial
                  Type '2' for temporal")
+    if(analySpatTemp ==2){analySpatTemp= "temporal"}
     if (analySpatTemp == 1) {
         analySpatTemp <-
             readline(prompt = "In which direction do you want the analysis to run?
                      Type '1' for East-West
                      Type '2' for South-North")
+    if(analySpatTemp ==1){analySpatTemp= "East-West"}
+    if(analySpatTemp ==2){analySpatTemp= "South-North"}
     }
-    if(analySpatTemp ==2){analySpatTemp= "temporal"}
-    }
+}
 
 # c. Fill value. What value to fill in NA/missing data with
 {fill <- readline(prompt = "What value should replace missing time series or spatial observations (NA)?
