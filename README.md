@@ -17,4 +17,4 @@ This is a basic example which shows you how to solve a common problem:
 ``` r
 NE <- getDataBBS("Nebrask.zip") # downloads a zip file and returns it as a data.frame
 ```
-
+Use `r GetRegions()` to find the zip file names of a particular state or province.
