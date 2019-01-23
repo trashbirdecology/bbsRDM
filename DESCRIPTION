@@ -15,7 +15,10 @@ Depends:
     ggplot2, 
     sp, 
     raster, 
-    here
+    here, 
+    feather, 
+    kedd,
+    devtools
 Imports:
     tictoc
 RoxygenNote: 6.1.1
