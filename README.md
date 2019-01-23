@@ -1,6 +1,6 @@
 # bbsRDM
 
-The goal of bbsRDM is to download BBS data from USGS's FTP server, and calculate various regime detection metrics
+The goal of bbsRDM is to download BBS data from the USGS's FTP server, and calculate various regime detection metrics. 
 
 ## Installation
 
@@ -17,4 +17,4 @@ This is a basic example which shows you how to solve a common problem:
 ``` r
 NE <- getDataBBS("Nebrask.zip") # downloads a zip file and returns it as a data.frame
 ```
-Use `r GetRegions()` to find the zip file names of a particular state or province.
+Use `r GetRegions()` to find the zip file names of a particular state (USA) or province (Canada). 
