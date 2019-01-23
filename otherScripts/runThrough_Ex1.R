@@ -1,15 +1,18 @@
 rm(list = ls())
+
+
 #################PART I: SETUP #########################################################################
 # I:   Load packages -------------------------------------------------------
 
 
-## Re-install often as this package is under major development.
+## Re-install `regimDetectionMeasures` often as this package is under major development.
 devtools::install_github("trashbirdecology/regimedetectionmeasures", force = T)
 library(regimeDetectionMeasures)
 library(sp)
 library(raster)
 library(feather)
 library(bbsRDM)
+library(feather)
 # devtools::install_github("collectivemedia/tictoc", force = F)  # Optional but must silence tic()s and toc()s in following lines
 library(tictoc)
 
@@ -21,7 +24,7 @@ bbsDir <- paste0(getwd(), paste0("/bbs_raw_data/"))
 if (length(list.files(bbsDir)) != 0) {
     warning(
         "The directory ",
-        resultsDir,
+        bbsDir,
         " already exists.. /nProceed with caution--files in this directory will likely be overwritten."
     )
 }
@@ -144,7 +147,7 @@ toc()
 # VII:  Subset by AOU codes ------------------------------------------------
 
 feathers <- subsetByAOU(myData = feathers)
-
+str(feathers)
 
 ################ PART IV: CALCULATE THE METRICS #########################################################
 # VIII: Define parameters for calculating the metrics  -------------------------
@@ -189,8 +192,8 @@ source(paste0(getwd(), "/otherScripts/mungeSubsetData.R"))
 
 # X.   Calculate the metrics ---------------------------------------------------
 
-## This script will run the analysis and write the results to file (in subdirectory 'myResults') as .feather files.
-source(paste0(getwd(), "/otherScripts/calculateMetrics.R"))
+## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
+calculateMetrics(dataIn = dataIn, metrics.to.calc = metrics.to.calc)
 
 }
 
@@ -211,11 +214,9 @@ print(
 
 # b. Import EWS results
 results_ews <-
-    importResults(resultsDir = resultsDir, myPattern = paste0('ews' , analySpatTemp, sep="|" ))
+    importResults(resultsDir = resultsDir, myPattern = 'ews')
+     ## FYI: varible should be missing (NA) for metricTypes fi and VI
 
-list.files(resultsDir, pattern= '?(ews)East')
-
-## FYI: varible should be missing (NA) for metricTypes fi and VI
 
 
 # c. Import distance results
@@ -226,12 +227,11 @@ results_dist <-
 ################ PART V: VISUALIZE THE METRICS  #########################################################
 # X. Visualize results ----------------------------------------------------
 
-plot.years = c( 2015)
-
+# years.use = c( 2015)
 
 # a. Plot distances
 results.to.plot <- results_dist %>%
-    filter(year %in% plot.years) %>%
+    filter(year %in% years.use) %>%
     left_join(routes_grid)
 
 
@@ -242,9 +242,9 @@ ggplot(results.to.plot) +
 
 
 # b. Plot ews
-results.to.plot <- results %>%
-    filter(year %in% plot.years)
-metrics.to.plot<- c("VI", "fiEqn_7.12", 'CV')
+results.to.plot <- results_ews %>%
+    filter(year %in% years.use)
+metrics.to.plot<- c("VI", "FI_Eqn7.12")
 
 ggplot(results.to.plot %>%
            filter(metricType %in% metrics.to.plot)) +
