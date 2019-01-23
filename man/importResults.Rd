@@ -14,6 +14,9 @@ importResults(resultsDir, myPattern)
 \value{
 A dataframe
 }
+\description{
+Load the regime detection metric results (.feathers)
+}
 \details{
 Used after running calculate_distanceTravelled()? to make results available
   for visualization?

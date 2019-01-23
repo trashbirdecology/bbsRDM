@@ -13,3 +13,6 @@ birdsToFeathers(dataIn, newDir, filename)
 
 \item{filename}{Name of the new filename (e.g., 'arizona.zip'). This function will replace .zip with .feather}
 }
+\description{
+Save BBS dataframe as a feather file
+}

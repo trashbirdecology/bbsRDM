@@ -13,3 +13,6 @@ mergeFunMassBBS(bbsData, funMass, printMissing = T)
 
 \item{printMissing}{Logical. Prints to screen the missing species.}
 }
+\description{
+Merge functional group and mass data for species with BBS counts
+}

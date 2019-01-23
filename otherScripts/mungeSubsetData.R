@@ -16,6 +16,7 @@ if(analySpatTemp == "East-West"){
         dplyr::select(-year, -lat)
     timeVar = 'long'
     rowInd = unique(birdData$rowID)
+
     yearInd = unique(birdData$year)
     if(length(rowInd)!=1){stop("dataIn is incorrect: check filtering.")}
 }

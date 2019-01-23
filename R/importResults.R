@@ -12,11 +12,13 @@ importResults <- function(resultsDir, myPattern) {
     files = list.files(resultsDir, pattern = myPattern)
     print(paste0("I am importing " , length(files) , " files."))
 
-    for(i in 1:length(files) )
+    for(i in 1:length(files) ){
+        feather = NULL
 
         feather <-read_feather(path = paste0(resultsDir, files[i]))
 
         results = rbind(feather, results)
+    }
 
     return(results)
 }

@@ -1,4 +1,5 @@
 #' @param myData A data frame including the column "aou".
+#' @title Subset the BBS data by species, functional traits, and/or body mass.
 #' @param subset.by One or more of   c("keep.diurnal", 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl').
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
 #' @export subsetByAOU

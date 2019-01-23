@@ -4,8 +4,8 @@
 \alias{createSamplingGrid}
 \title{Generate a sampling grid}
 \usage{
-createSamplingGrid(cs = c(0.5, 0.5), bbLat = c(51, 23), bbLong = c(-52,
-  -128))
+createSamplingGrid(cs = c(0.5, 0.5), bbLat = c(51, 23),
+  bbLong = c(-52, -128))
 }
 \arguments{
 \item{cs}{Cell size (in degree lat, long). Default is 0.5 degree long by 0.5 degree lat. In this region, 1 deg latitude ~= 69 miles & 1 deg longitude ~= 55 miles. The total length of a BBS route is ~50 miles. Caution when using degrees > 1, as multiple routes can fall into a single cell.}

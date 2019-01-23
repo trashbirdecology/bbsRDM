@@ -14,6 +14,9 @@ GetUnzip(ZipName, FileName)
 \value{
 A dataframe
 }
+\description{
+Downloads and unzips a zip archive
+}
 \details{
 Used internally. If ZipName begins with 'http' or 'ftp', then download and unzip to
   Filename and return as a dataframe. Otherwise, unzip Zipname and return as a data.frame.

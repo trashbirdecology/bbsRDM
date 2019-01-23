@@ -4,7 +4,8 @@
 \alias{GetSpNames}
 \title{Download species names}
 \usage{
-GetSpNames(Dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/")
+
+  GetSpNames(Dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/")
 }
 \arguments{
 \item{Dir}{ftp URL for directory with data files}
