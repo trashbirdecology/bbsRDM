@@ -9,10 +9,10 @@
 #' @export
 #'
 calculate_distanceTravelled <-
-    function(dataIn,
+    function(dataInDist,
              derivs = T,
              print = T) {
-        distances <- dataIn %>% group_by(variable) %>% arrange(variable,
+        distances <- dataInDist %>% group_by(variable) %>% arrange(variable,
                                                                time) %>% mutate(dx = value - lag(value)) %>% na.omit(dx) %>%
             ungroup() %>%
             group_by(time) %>%
