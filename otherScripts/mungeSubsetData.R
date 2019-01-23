@@ -1,8 +1,9 @@
 # A. For temporal analyses:
 if(analySpatTemp == "temporal"){
     dataIn <- birdData %>%
-        dplyr::rename(time = year) %>%
-        dplyr::select(-long, -lat)
+        dplyr::rename(time = year)
+    # %>%
+    #     dplyr::select(-long, -lat)
     timeVar = 'year'
     stateInd = unique(birdData$statenum)
     routeInd = unique(birdData$route)
@@ -12,8 +13,9 @@ if(analySpatTemp == "temporal"){
 # B. For spatial analyses:
 if(analySpatTemp == "East-West"){
     dataIn <- birdData %>%
-        dplyr::rename(time = long) %>%
-        dplyr::select(-year, -lat)
+        dplyr::rename(time = long)
+    # %>%
+    #     dplyr::select(-year, -lat)
     timeVar = 'long'
     rowInd = unique(birdData$rowID)
 
@@ -22,8 +24,9 @@ if(analySpatTemp == "East-West"){
 }
 if(analySpatTemp == "South-North"){
     dataIn <- birdData %>%
-        dplyr::rename(time = lat) %>%
-        dplyr::select(-year, -long)
+        dplyr::rename(time = lat)
+    # %>%
+    #     dplyr::select(-year, -long)
     timeVar = 'lat'
     colInd = unique(birdData$colID)
     yearInd = unique(birdData$year)
@@ -33,7 +36,7 @@ if(analySpatTemp == "South-North"){
 
 dataIn <- dataIn %>%
     dplyr::select(
-        time, variable, value) %>%
+        time, variable, value, cellID) %>%
     # need to arrange by time to make sure the distances are calculated correctly!
     dplyr::group_by(variable, time) %>%
     summarise(value = sum(value)) %>%

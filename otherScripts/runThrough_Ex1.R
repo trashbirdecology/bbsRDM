@@ -95,7 +95,8 @@ cs <-
 # Create the grid
 routes_gridList <- createSamplingGrid(cs = cs)
 routes_grid <- routes_gridList$routes_grid
-sp_grd <- routes_gridList$sp_grd; rm(cs)
+sp_grd <- routes_gridList$sp_grd
+rm(cs)
 
 
 # V:   Load BBS data and overlay the sampling grid ----------------------------------
@@ -121,12 +122,13 @@ toc()
 
 
 ################ PART III: SUBSET THE SPECIES DATA ######################################################
-    ### This section is optional, however, we do not recommend using all raw bbs data.
-    ### Two choices here:
-        ### Section VI:  Subsets by specific functional traits and/or body masses. More tedious than VII.
-        ### Section VII: Subset by larger groups of species according to AOU code #s.
+### This section is optional, however, we do not recommend using all raw bbs data.
+### Two choices here:
+### Section VI:  Subsets by specific functional traits and/or body masses. More tedious than VII.
+### Section VII: Subset by larger groups of species according to AOU code #s.
 
- print("This is the data we will work with hereafter."); head(feathers)
+print("This is the data we will work with hereafter.")
+head(feathers)
 
 # # VI: OPTIONAL Subset by the functional traits and body mass data ----------------------
 #
@@ -159,7 +161,8 @@ str(feathers)
 # Option 2: Manually define parameters for regimeDetectionMeasures functions.
 metrics.to.calc <- c("distances", "ews")
 analySpatTemp <-
-    "East-West" # choose one of : 'South-North', 'East-West', or 'temporal'
+    # "South-North"
+"East-West" # choose one of : 'South-North', 'East-West', or 'temporal'
 fill = 0
 min.samp.sites = 3
 min.window.dat = 3
@@ -168,58 +171,57 @@ winMove = 0.1
 to.calc = c("EWS", "FI", "VI")
 
 # VIX:  Create a dataset for analysis -----------------------------------------------------
-
+# Create loop indices
 years.use = unique(feathers$year)
-    # keep only the years divisible by 5
-    years.use  <- years.use[which(years.use %% 5 == 0)] %>% sort()
+# keep only the years divisible by 5
+years.use  <- years.use[which(years.use %% 5 == 0)] %>% sort()
 
-for(i in 1:length(years.use)){
+rows.use <-
+    unique(feathers$rowID)
+rows.use <- rows.use[!is.na(rows.use)] %>% sort()
+cols.use <-
+    unique(feathers$colID)
+cols.use <- cols.use[!is.na(cols.use)] %>% sort()
 
-# a. Subset the data according to year, colID, rowID, state, country, etc.
-birdData <- feathers %>%
-    filter(year == years.use[i],
-           # colID == 42) %>%
-rowID == 14) %>%
-# statenum == 2,
-# route == 14) %>%
-dplyr::rename(variable = aou,
-              value = stoptotal)
+for (j in 1:length(rows.use)) {
+    for (i in 1:length(years.use)) {
+        # a. Subset the data according to year, colID, rowID, state, country, etc.x
+        birdData <- feathers %>%
+            filter(year == years.use[i],
+                   # colID == 42) %>%
+                   rowID == rows.use[j]) %>%
+                   # colID == cols.use[j]) %>%
+            # statenum == 2,
+            # route == 14) %>%
+            dplyr::rename(variable = aou,
+                          value = stoptotal)
 
-# b. Munge the data further
-source(paste0(getwd(), "/otherScripts/mungeSubsetData.R"))
-    # This script will produce a dataset called `dataIn`, and will fill paramters for labeling.
+        if (nrow(birdData) == 0) {
+            next
+        }
+
+        # b. Munge the data further
+        source(paste0(getwd(), "/otherScripts/mungeSubsetData.R"))
+        # This script will produce a dataset called `dataIn`, and will fill paramters for labeling.
 
 
-# X.   Calculate the metrics ---------------------------------------------------
+        # X.   Calculate the metrics ---------------------------------------------------
 
-## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
-calculateMetrics(dataIn = dataIn, metrics.to.calc = metrics.to.calc)
+        ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
+        calculateMetrics(dataIn = dataIn, metrics.to.calc = metrics.to.calc)
 
+    }
 }
-
 # XI. Load the results --------------------------------------------------------
 
-# a. check out the files in your results subdirectory.
-list.files(resultsDir)
-print(
-    paste0(
-        "Are you sure you want to use ALL of these results?",
-        " Does ",
-        length(list.files(resultsDir))
-        ,
-        " files sound right?!"
-    )
-)
-
-
-# b. Import EWS results
+# a. Import EWS results
 results_ews <-
     importResults(resultsDir = resultsDir, myPattern = 'ews')
-     ## FYI: varible should be missing (NA) for metricTypes fi and VI
+## FYI: varible should be missing (NA) for metricTypes fi and VI
 
 
 
-# c. Import distance results
+# b. Import distance results
 results_dist <-
     importResults(resultsDir = resultsDir, myPattern = 'distance')
 
@@ -237,24 +239,31 @@ results.to.plot <- results_dist %>%
 
 ggplot(results.to.plot) +
     geom_line(aes(x = long,
-                  y = metricValue, color = as.factor(year)))+
-    facet_wrap(~metricType, scales ="free_y")
+                  y = metricValue, color = as.factor(year))) +
+    facet_wrap( ~ metricType, scales = "free_y")
 
 
 # b. Plot ews
 results.to.plot <- results_ews %>%
     filter(year %in% years.use)
-metrics.to.plot<- c("VI", "FI_Eqn7.12")
+metrics.to.plot <- c("VI", "FI_Eqn7.12")
 
 ggplot(results.to.plot %>%
            filter(metricType %in% metrics.to.plot)) +
     geom_line(aes(x = winStart,
-                  y = metricValue, color = as.factor(year)))+
-    facet_wrap(~metricType , scales ="free_y", ncol = 1)
+                  y = metricValue, color = as.factor(year))) +
+    facet_wrap( ~ metricType , scales = "free_y", ncol = 1)
 
 
 
-coordinates(meuse.grid) = ~x+y
-proj4string(meuse.grid) <- CRS("+init=epsg:28992")
-gridded(meuse.grid) = TRUE
-spplot(meuse.grid)
+head(results.to.plot)
+
+# Spatial visualization ---------------------------------------------------
+
+
+coordinates(sp_grd)
+spplot(sp_grd)
+
+coordinates(results.to.plot) <-
+
+    View(sp_grd)
