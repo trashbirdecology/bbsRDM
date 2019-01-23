@@ -1,5 +1,12 @@
+#' @title Calculate chosen regime detection metrics
+#' @description
+#' @param dataIn A data frame containing columns c(variable, time, value).
+#'
+#' @param metrics.to.calc One or more of c("distances", "ews")
+#' @export calculateMetrics
 
-
+calculateMetrics <- function(dataIn = dataIn, metrics.to.calc = c("distances", "ews")
+){
 
 if("distances" %in% metrics.to.calc) {
     metricInd = "distances"
@@ -12,7 +19,6 @@ if("distances" %in% metrics.to.calc) {
     results <- NULL
     results <- calculate_distanceTravelled(dataInDist, derivs = T) %>%
         gather(key = 'metricType', value ='metricValue', -time)
-
 
     saveMyResults(results ,resultsDir =resultsDir, analySpatTemp =analySpatTemp, metricInd = metricInd)
 
@@ -60,3 +66,4 @@ if ("ews" %in% metrics.to.calc) {
 
 } # END EWS calcs
 
+}
