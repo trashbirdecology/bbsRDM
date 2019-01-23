@@ -4,14 +4,14 @@
 \alias{calculate_distanceTravelled}
 \title{Calculate the `distance travelled` by the entire system.}
 \usage{
-calculate_distanceTravelled(dataIn, derivs = T, print = T)
+calculate_distanceTravelled(dataInDist, derivs = T, print = T)
 }
 \arguments{
-\item{dataIn}{input dataframe}
-
 \item{derivs}{logical (default TRUE). calculate derivatives as well}
 
 \item{print}{logical (default TRUE). print output}
+
+\item{dataIn}{input dataframe}
 }
 \description{
 Also calculates the velocity and acceleration of the entire system over the time series.
