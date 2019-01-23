@@ -1,9 +1,9 @@
-#' @title Calculate chosen regime detection metrics
-#' @description
-#' @param dataIn A data frame containing columns c(variable, time, value).
-#'
+#' @title Calculate regime detection metrics
+#' @description Calculates regime detection metrics across space or time. Calculates distance travelled, Fisher Information, Variance Index, Coefficient of Variation, mean, standard deviation, variance,skewness, and kurtosis. #' @param dataIn A data frame containing columns c(variable, time, value).
 #' @param metrics.to.calc One or more of c("distances", "ews")
+#' @param min.samp.sites Minimum number of unique sites in the transect (or unique times along the time series) required to analyze the data. Most metrics can be calculated using three data points, although we do not nrecommend this.
 #' @export calculateMetrics
+#' @example
 
 calculateMetrics <-
     function(dataIn = dataIn,
@@ -36,13 +36,14 @@ calculateMetrics <-
                 results <- calculate_distanceTravelled(dataIn, derivs = T) %>%
                     gather(key = 'metricType', value = 'metricValue',-time)
 
-
+                # Save the results, if exist
+                if(!exists("results") | !is.null(results)){
                 saveMyResults(
                     results ,
                     resultsDir = resultsDir,
                     analySpatTemp = analySpatTemp,
                     metricInd = metricInd
-                )
+                )}
 
             }
         }
@@ -62,7 +63,7 @@ calculateMetrics <-
 
             results <- NULL
             results <-
-                rdm_window_analysis(
+                rdm_window_analysisTEMP(
                     dataInRDM = dataIn %>%
                         # arrange the data in temporal (spatial) order
                         dplyr::group_by(variable) %>%
@@ -76,12 +77,14 @@ calculateMetrics <-
                     to.calc = to.calc
                 )
 
+            # Save the results, if exist
+            if(!exists("results") | !is.null(results)){
             saveMyResults(
                 results ,
                 resultsDir = resultsDir,
                 analySpatTemp = analySpatTemp,
                 metricInd = metricInd
-            )
+            )}
 
         } # leave EWS calculations
 

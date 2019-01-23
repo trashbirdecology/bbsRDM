@@ -1,10 +1,12 @@
-#' Generate a sampling grid
-#'
-#' Create a sampling grid across the continental united states and assign BBS routes to specific columns and rows.
-#'
+#' @title Generate a sampling grid (rectangular) for regions in North America.
+#' @description  Creates a sampling grid across the continental united states and assign BBS routes to specific a row and column ID. If cs < 0.5^2 there's a chance a cell contains more than one BBS route.
 #' @param cs Cell size (in degree lat, long). Default is 0.5 degree long by 0.5 degree lat. In this region, 1 deg latitude ~= 69 miles & 1 deg longitude ~= 55 miles. The total length of a BBS route is ~50 miles. Caution when using degrees > 1, as multiple routes can fall into a single cell.
-#' @param bbLat Min and max latitude of analysis, order irrelevant.
-#' @param bbLong Min and max longitude of analysis, order irrelevant.
+#' @param bbLat Min and max (in any order) latitude coordinates for the bounding box. The function removes routes (lat,long) falling outside these coordinates.  Default = c(23, 51). See also 'bbLong'.
+#' @param bbLong Min and max (in any order) longitude for the bounding box. The function removes routes (lat,long) falling outside these coordinates. Default = c(23, 51). See also 'bbLat'.
+#' @export createSamplingGrid
+#' @usage routes_gridList <- createSamplingGrid(cs = c(0.5, 0.5))
+#' @examples
+#' @keywords bbs, routes
 
 createSamplingGrid <- function(cs = c(0.5, 0.5), bbLat = c(51, 23) , bbLong =  c(-52, -128)){
   # A: BBS Routes ------------------------------------------------------------
