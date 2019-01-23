@@ -1,5 +1,5 @@
 rm(list = ls())
-#################PART I: SETUP #####################################################################
+#################PART I: SETUP #########################################################################
 # I:   Load packages -------------------------------------------------------
 
 
@@ -87,7 +87,7 @@ if (length(list.files(resultsDir)) != 0) {
 # 1 deg latitude ~= 69 miles
 # 1 deg longitude ~= 55 miles
 cs <-
-    c(0.5, 0.5)  # default is cell size 0.5 deg lat x 0.5 deg long
+    c(1, 1)  # default is cell size 0.5 deg lat x 0.5 deg long
 
 # Create the grid
 routes_gridList <- createSamplingGrid(cs = cs)
@@ -156,24 +156,27 @@ feathers <- subsetByAOU(myData = feathers)
 # Option 2: Manually define parameters for regimeDetectionMeasures functions.
 metrics.to.calc <- c("distances", "ews")
 analySpatTemp <-
-    "South-North" # choose one of : 'South-North', 'East-West', or 'temporal'
+    "East-West" # choose one of : 'South-North', 'East-West', or 'temporal'
 fill = 0
-min.samp.sites = 15
+min.samp.sites = 3
 min.window.dat = 3
 fi.equation = "7.12"
-winMove = 0.25
+winMove = 0.1
 to.calc = c("EWS", "FI", "VI")
 
 # VIX:  Create a dataset for analysis -----------------------------------------------------
 
 years.use = unique(feathers$year)
+    # keep only the years divisible by 5
+    years.use  <- years.use[which(years.use %% 5 == 0)] %>% sort()
+
 for(i in 1:length(years.use)){
 
 # a. Subset the data according to year, colID, rowID, state, country, etc.
 birdData <- feathers %>%
     filter(year == years.use[i],
-           colID == 81) %>%
-# rowID == 14
+           # colID == 42) %>%
+rowID == 14) %>%
 # statenum == 2,
 # route == 14) %>%
 dplyr::rename(variable = aou,
@@ -182,6 +185,7 @@ dplyr::rename(variable = aou,
 # b. Munge the data further
 source(paste0(getwd(), "/otherScripts/mungeSubsetData.R"))
     # This script will produce a dataset called `dataIn`, and will fill paramters for labeling.
+
 
 # X.   Calculate the metrics ---------------------------------------------------
 
@@ -206,8 +210,11 @@ print(
 
 
 # b. Import EWS results
-results_EWS <-
-    importResults(resultsDir = resultsDir, myPattern = 'ews')
+results_ews <-
+    importResults(resultsDir = resultsDir, myPattern = paste0('ews' , analySpatTemp, sep="|" ))
+
+list.files(resultsDir, pattern= '?(ews)East')
+
 ## FYI: varible should be missing (NA) for metricTypes fi and VI
 
 
@@ -216,7 +223,38 @@ results_dist <-
     importResults(resultsDir = resultsDir, myPattern = 'distance')
 
 
-# d. Join the results
 ################ PART V: VISUALIZE THE METRICS  #########################################################
 # X. Visualize results ----------------------------------------------------
 
+plot.years = c( 2015)
+
+
+# a. Plot distances
+results.to.plot <- results_dist %>%
+    filter(year %in% plot.years) %>%
+    left_join(routes_grid)
+
+
+ggplot(results.to.plot) +
+    geom_line(aes(x = long,
+                  y = metricValue, color = as.factor(year)))+
+    facet_wrap(~metricType, scales ="free_y")
+
+
+# b. Plot ews
+results.to.plot <- results %>%
+    filter(year %in% plot.years)
+metrics.to.plot<- c("VI", "fiEqn_7.12", 'CV')
+
+ggplot(results.to.plot %>%
+           filter(metricType %in% metrics.to.plot)) +
+    geom_line(aes(x = winStart,
+                  y = metricValue, color = as.factor(year)))+
+    facet_wrap(~metricType , scales ="free_y", ncol = 1)
+
+
+
+coordinates(meuse.grid) = ~x+y
+proj4string(meuse.grid) <- CRS("+init=epsg:28992")
+gridded(meuse.grid) = TRUE
+spplot(meuse.grid)
