@@ -1,7 +1,5 @@
 
 
-# a. Create an empty list for storing the results
-resultsList <- list()
 
 if("distances" %in% metrics.to.calc) {
     metricInd = "distances"
@@ -12,15 +10,13 @@ if("distances" %in% metrics.to.calc) {
 
     # Calc distances
     results <- NULL
-
     results <- calculate_distanceTravelled(dataInDist, derivs = T) %>%
         gather(key = 'metricType', value ='metricValue', -time)
 
-    resultsList$distance <- results
+
+    saveMyResults(results ,resultsDir =resultsDir, analySpatTemp =analySpatTemp, metricInd = metricInd)
 
     rm(dataInDist)
-
-    saveMyResults(resultsList$distance ,resultsDir =resultsDir, analySpatTemp =analySpatTemp, metricInd = metricInd)
 
 }
 
@@ -54,11 +50,11 @@ if ("ews" %in% metrics.to.calc) {
             fill = fill,
             to.calc = to.calc)
 
-    resultsList$ews <- results
+    saveMyResults(results , resultsDir =resultsDir, analySpatTemp =analySpatTemp, metricInd = metricInd)
+
 
     rm(dataInRDM)
 
-    saveMyResults(resultsList$ews , resultsDir =resultsDir, analySpatTemp =analySpatTemp, metricInd = metricInd)
 
     }else(print(paste0("# data points < min.samp.sites... skipping loop ", i)))
 
