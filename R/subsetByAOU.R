@@ -1,11 +1,11 @@
 #' @param myData A data frame including the column "aou".
 #' @title Subset the BBS data by species, functional traits, and/or body mass.
-#' @param subset.by One or more of   c("keep.diurnal", 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl').
+#' @param subset.by One or more of 'remove.fowl' (removes waterfowl), "remove.shorebirds" (removes shorebirds and waders),  'remove.shoreWaderFowl' (removes shorebirds, waders, and fowl).
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
 #' @export subsetByAOU
 
 
-subsetByAOU <- function(myData, subset.by = c("keep.diurnal", 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl')){
+subsetByAOU <- function(myData, subset.by = c( 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl')){
     # subset.by =c("keep.diurnal", 'remove.fowl', "remove.shorebirds", "  'remove.shoreWaderFowl')
 
 

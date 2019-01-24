@@ -15,7 +15,7 @@ rdm_window_analysisTEMP <- function(dataInRDM,
                                 to.calc = c('VI', 'FI', 'EWS'),
                                 fill = 0
 ){
-  if (winMove > 1 | winMove < 1e-10) {
+  if (winMove > 1 | winMove < 0.00000000001) {
     stop("winMove must be a number between zero and one")
   }
 

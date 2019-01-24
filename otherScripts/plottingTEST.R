@@ -5,16 +5,16 @@ library(viridis)
 
 test_data <- full_join(
     coords_grd,
-    results_dist %>% dplyr::select(metricType, metricValue, cellID, year, rowID)
+    results_dist %>% dplyr::select(metricType, metricValue, cellID, year, colID)
 ) %>%  na.omit(metricType) %>%
     filter(year %in% c(1980, 1990, 2000, 2010),
-           metricType == "s") %>%
-    group_by(rowID, year) %>%
-    mutate(scaledMetricValue.byrow = base::scale(metricValue, center =T)) %>%
+           metricType == "dsdt") %>%
+    group_by(colID, year) %>%
+    mutate(scaledMetricValue.bycol = base::scale(metricValue, center =T)) %>%
     ungroup() %>%
     na.omit(metricValue)
 
-ggplot() + geom_raster(data = test_data, aes(x = long, y = lat, fill = scaledMetricValue.byrow)) +
+ggplot() + geom_raster(data = test_data, aes(x = long, y = lat, fill = scaledMetricValue.bycol)) +
     coord_fixed(ratio = 1) +
     scale_fill_viridis(direction = -1) +
     facet_wrap(~year, ncol = 2, strip.position = "top") +
@@ -23,15 +23,18 @@ ggplot() + geom_raster(data = test_data, aes(x = long, y = lat, fill = scaledMet
 
 ## plot the change in values over time
 test_data2<-test_data %>%
+    na.omit(metricValue) %>%
     group_by(metricType, cellID) %>%
     arrange(year) %>%
-    mutate(dScaledMetricValue.byrow = scaledMetricValue.byrow - lag(scaledMetricValue.byrow)) %>%
-    na.omit(metricValue)
+    mutate(dScaledMetricValue.bycol = scaledMetricValue.bycol - lag(scaledMetricValue.bycol))
 
 
-ggplot() + geom_raster(data = test_data2, aes(x = long, y = lat, fill = dScaledMetricValue.byrow)) +
+ggplot() + geom_raster(data = test_data2, aes(x = long, y = lat, fill = dScaledMetricValue.bycol)) +
     coord_fixed(ratio = 1) +
     scale_fill_viridis(direction = -1) +
     facet_wrap(~year, ncol = 2, strip.position = "right") +
     theme(legend.position = "none")
+
+
+
 

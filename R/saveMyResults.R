@@ -8,7 +8,12 @@
 saveMyResults <- function(results,
                           resultsDir,
                           analySpatTemp,
-                          metricInd) {
+                          metricInd,
+                          timeVar,
+                          rowInd,
+                          yearInd,
+                          colInd
+                          ) {
     ## FOR SPATIAL ANALYSES ##
     # Fix the time column names and add columns
     if (timeVar == "long") {
@@ -28,7 +33,8 @@ saveMyResults <- function(results,
     if (metricInd == "distances") {
         results <- results %>%
             dplyr::rename(long = time)
-    }
+        resultsDir <- paste0(resultsDir, "distances" )
+    }else(resultsDir <- paste0(resultsDir, "ews" ))
 
 
     ## WRITE TO FILE ##

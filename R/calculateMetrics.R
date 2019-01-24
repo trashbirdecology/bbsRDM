@@ -8,7 +8,8 @@
 calculateMetrics <-
     function(dataIn,
              metrics.to.calc = c("distances", "ews"),
-             min.samp.sites = 8) {
+             min.samp.sites = 8,
+             timeVar = NULL) {
         ## Munge the input data a little --this is a failsafe!
         # keep only the relevant columns
         dataIn  <- dataIn %>%
@@ -51,7 +52,8 @@ calculateMetrics <-
                     results ,
                     resultsDir = resultsDir,
                     analySpatTemp = analySpatTemp,
-                    metricInd = metricInd
+                    metricInd = metricInd,
+                    timeVar = timeVar
                 )}
 
             }
@@ -93,7 +95,8 @@ calculateMetrics <-
                 results ,
                 resultsDir = resultsDir,
                 analySpatTemp = analySpatTemp,
-                metricInd = metricInd
+                metricInd = metricInd,
+                timeVar = timeVar
             )}
 
         } # leave EWS calculations
