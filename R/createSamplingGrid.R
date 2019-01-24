@@ -1,14 +1,14 @@
 #' @title Generate a sampling grid (rectangular) for regions in North America.
-#' @description  Creates a sampling grid across the continental united states and assign BBS routes to specific a row and column ID. If cs < 0.5^2 there's a chance a cell contains more than one BBS route.
-#' @param cs Cell size (in degree lat, long). Default is 0.5 degree long by 0.5 degree lat. In this region, 1 deg latitude ~= 69 miles & 1 deg longitude ~= 55 miles. The total length of a BBS route is ~50 miles. Caution when using degrees > 1, as multiple routes can fall into a single cell.
+#' @description  Creates a sampling grid across the continental united states and assign BBS routes to specific a row and column ID.
+#' @param cs Cell size (in degree lat, long). Default is 0.5 degree long by 0.5 degree lat. In this region, 1 deg latitude ~= 69 miles & 1 deg longitude ~= 55 miles. The total length of a BBS route is ~50 miles. Caution when using degrees < 1 by 1 degree as a single route could fal into multiple cells...
 #' @param bbLat Min and max (in any order) latitude coordinates for the bounding box. The function removes routes (lat,long) falling outside these coordinates.  Default = c(23, 51). See also 'bbLong'.
 #' @param bbLong Min and max (in any order) longitude for the bounding box. The function removes routes (lat,long) falling outside these coordinates. Default = c(23, 51). See also 'bbLat'.
 #' @export createSamplingGrid
-#' @usage routes_gridList <- createSamplingGrid(cs = c(0.5, 0.5))
+#' @usage routes_gridList <- createSamplingGrid(cs = c(1,1))
 #' @examples
 #' @keywords bbs, routes
 
-createSamplingGrid <- function(cs = c(0.5, 0.5), bbLat = c(51, 23) , bbLong =  c(-52, -128)){
+createSamplingGrid <- function(cs,  bbLat = c(51, 23) , bbLong =  c(-52, -128)){
   # A: BBS Routes ------------------------------------------------------------
 
   # Load the BBS routes information and location
@@ -32,7 +32,7 @@ createSamplingGrid <- function(cs = c(0.5, 0.5), bbLat = c(51, 23) , bbLong =  c
 
   # Set projection to WGS84 lat long friendly
   sp::proj4string(routes) <-
-    sp::CRS("+proj=longlat +datum=WGS84")
+      sp::CRS("+proj=longlat +datum=WGS84")
 
 
   # Create a bounding box around the BBS route lines
@@ -41,7 +41,7 @@ createSamplingGrid <- function(cs = c(0.5, 0.5), bbLat = c(51, 23) , bbLong =  c
 
   if (!exists("cs")) {
     # Define the SpatialGRid cell size based on degrees lat/long
-    cs <- c(0.500, 0.500)  # cell size 0.5 deg lat x 0.5 deg long
+    cs <- c(1, 1)  # cell size 0.5 deg lat x 0.5 deg long
     # 1 deg latitude ~= 69 miles
     # 1 deg longitude ~= 55 miles
   }
