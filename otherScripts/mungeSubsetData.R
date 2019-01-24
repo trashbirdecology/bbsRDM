@@ -18,7 +18,6 @@ if(analySpatTemp == "East-West"){
     #     dplyr::select(-year, -lat)
     timeVar = 'long'
     rowInd = unique(birdData$rowID)
-
     yearInd = unique(birdData$year)
     if(length(rowInd)!=1){stop("dataIn is incorrect: check filtering.")}
 }
@@ -38,8 +37,9 @@ dataIn <- dataIn %>%
     dplyr::select(
         time, variable, value, cellID) %>%
     # need to arrange by time to make sure the distances are calculated correctly!
-    dplyr::group_by(variable, time) %>%
+    dplyr::group_by(variable, time, cellID) %>%
     summarise(value = sum(value)) %>%
     dplyr::group_by(variable) %>%
     arrange(variable, time) %>%
     ungroup()
+

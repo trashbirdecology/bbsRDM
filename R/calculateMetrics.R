@@ -6,35 +6,44 @@
 #' @example
 
 calculateMetrics <-
-    function(dataIn = dataIn,
+    function(dataIn,
              metrics.to.calc = c("distances", "ews"),
              min.samp.sites = 8) {
         ## Munge the input data a little --this is a failsafe!
         # keep only the relevant columns
         dataIn  <- dataIn %>%
-            dplyr::select(time, variable, value) %>%
+            dplyr::select(time, variable, value, cellID) %>%
             # add up any species having multiple observations -- this happens esp. for hybrids! is common.
-            group_by(variable, time) %>%
+            group_by(variable, time, cellID) %>%
             summarise(value = sum(value)) %>%
             ungroup()
+
+        ## create an id for joining the results with cell ID.
+        id <- dataIn %>% dplyr::select(time, cellID) %>% distinct()
+
 
 
         if(length(unique(dataIn$time)) < min.samp.sites){
              flag = "# dataIn$time points < min.samp.sites. Not calculating metrics. "
             return(flag)
-}
+        }
 
         ## Calculate distance traveled
         if ("distances" %in% metrics.to.calc) {
             metricInd = "distances"
             # keep only the relevant columns
             dataIn  <- dataIn %>%
-                dplyr::select(time, variable, value)
+                dplyr::select(time, variable, value, cellID)
             if (!length(unique(dataIn$time)) < min.samp.sites) {
                 # Calc distances
                 results <- NULL
                 results <- calculate_distanceTravelled(dataIn, derivs = T) %>%
                     gather(key = 'metricType', value = 'metricValue',-time)
+
+                # Add the cellID back onto the results
+                id <- dataIn %>% dplyr::select(time, cellID) %>% distinct()
+
+                results <- left_join(results, id)
 
                 # Save the results, if exist
                 if(!exists("results") | !is.null(results)){
@@ -76,6 +85,7 @@ calculateMetrics <-
                     fill = fill,
                     to.calc = to.calc
                 )
+
 
             # Save the results, if exist
             if(!exists("results") | !is.null(results)){
