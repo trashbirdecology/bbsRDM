@@ -1,11 +1,13 @@
 rm(list = ls())
 
 #################PART I: SETUP #########################################################################
-# I:   Load packages -------------------------------------------------------
+# I:    Load packages -------------------------------------------------------
 
 
 ## Re-install `regimDetectionMeasures` often as this package is under major development.
-devtools::install_github("trashbirdecology/regimedetectionmeasures", force = T, dep=F)
+devtools::install_github("trashbirdecology/regimedetectionmeasures",
+                         force = T,
+                         dep = F)
 
 library(regimeDetectionMeasures)
 library(sp)
@@ -16,7 +18,7 @@ library(feather)
 # devtools::install_github("collectivemedia/tictoc", force = F)  # Optional but must silence tic()s and toc()s in following lines
 library(tictoc)
 
-# II:  Directories   ---------------------------------------------------
+# II:   Directories   ---------------------------------------------------
 
 # a. Create a directory to store and/or load the BBS data as feathers
 dir.create(file.path(getwd(), paste0("/bbs_raw_data")))
@@ -32,18 +34,16 @@ if (length(list.files(bbsDir)) != 0) {
 # b. Create directories to store and/or load the BBS data as feathers
 resultsDir <- paste0(getwd(), paste0("/myResults/"))
 if (length(list.files(resultsDir)) != 0) {
-    warning(
-        "The directory ",
-        resultsDir,
-        " already exists. Files will be overwritten."
-    )
+    warning("The directory ",
+            resultsDir,
+            " already exists. Files will be overwritten.")
 }
 dir.create(file.path(getwd(), paste0("/myResults")))
 dir.create(file.path(getwd(), paste0("/myResults/distances")))
 dir.create(file.path(getwd(), paste0("/myResults/ews")))
 
 
-# # III: OPTIONAL IF DATA ALREADY DOWNLOADED: Import BBS and save to disk as feathers -----------------------------------------------
+# III:  OPTIONAL IF DATA ALREADY DOWNLOADED: Import BBS and save to disk as feathers -----------------------------------------------
 # ##FYI:  ~10-15 MINUTES TO DOWNLOAD ALL STATE FILES FOR ALL YEARS!
 #
 # # a. Load the regional (list of states, regions) .txt file from Patuxent
@@ -87,7 +87,7 @@ dir.create(file.path(getwd(), paste0("/myResults/ews")))
 #
 #
 ################# PART II: CREATE SAMPLING GRID USING BBS ROUTES ########################################
-# IV:  Build a spatial sampling grid --------------------------------------------------------
+# IV:   Build a spatial sampling grid --------------------------------------------------------
 # Define the grid's cell size (lat, long; unit:degrees)
 # 1 deg latitude ~= 69 miles
 # 1 deg longitude ~= 55 miles
@@ -97,8 +97,10 @@ cs <-
 # Create the sampling grid
 routes_gridList <- createSamplingGrid(cs)
 
+cellFromRowCol(raster(routes_gridList$routes_grid))
+gridded(routes_gridList$sp_grd)
 
-# V:   Load BBS data and overlay the sampling grid ----------------------------------
+# V:    Load BBS data and overlay the sampling grid ----------------------------------
 
 ### Load all the feathers in bbsDir, munge, and rbind
 ### FYI: ~ 1/2 minutes to upload ALL BBS DATA; ~350MB as feather object
@@ -157,9 +159,9 @@ feathers <- subsetByAOU(myData = feathers, 'remove.shoreWaderFowl')
 
 # Option 2: Manually define parameters for regimeDetectionMeasures functions.
 metrics.to.calc <- c("ews", "distances")
-analySpatTemp <-
+direction <-
     "South-North"
-    # "East-West" # choose one of : 'South-North', 'East-West', or 'temporal'
+# "East-West" # choose one of : 'South-North', 'East-West', or 'temporal'
 fill = 0 # Fills in missing species counts with ZERO.
 min.samp.sites = 8
 min.window.dat = 3
@@ -174,59 +176,63 @@ years.use = unique(feathers$year)
 years.use  <- years.use[which(years.use %% 5 == 0)] %>% sort()
 
 # Define some filtering and labeling parameters based on direction of spatial analysis (if applicable)
-if (analySpatTemp == "South-North") {
-    timeVar = "lat"
+if (direction == "South-North") {
     dir.use =  unique(feathers$rowID) %>% na.omit(rowID) %>% sort()
+
 }
-if (analySpatTemp == "East-West") {
-    timeVar = "long"
+
+
+if (direction == "East-West") {
     dir.use = unique(feathers$colID) %>% na.omit(colID) %>% sort()
 }
 
 
 
-# VIX:  Subset the  a dataset for SPATIAL ANALYSIS  -----------------------------------------------------
+# VIX:  Conduct analyses  -----------------------------------------------------
 
 ## First, filter the data by dir.use indices and munge
-for (j in 1:length(dir.use)){
-        # For east-west analysis
-        {
-            if (analySpatTemp == "East-West")
-                birdsData <- feathers %>%
-                    filter(rowID == dir.use[j]) %>%
-                    mutate(dir.use = analySpatTemp,
-                           dirID = "rowID")
-        }
-        # For south-north analysis
-        {
-            if (analySpatTemp == "South-North")
-                birdsData <- feathers %>%
-                filter(year == years.use[i],
-                       colID == dir.use[j]) %>%
-                mutate(dir.use = analySpatTemp,
-                       dirID = "rowID")
-
-        }
-
-        if(nrow(birdsData) < min.samp.sites){next(print(paste0("Not enough data to analyze. Skipping j-loop ", dir.use[j])))}
+for (j in 1:length(dir.use)) {
+    # For east-west analysis
+    {
+        if (direction == "East-West")
+            birdsData <- feathers %>%
+                filter(rowID == dir.use[j]) %>%
+                mutate(direction = direction,
+                       dirID = dir.use[j])
+    }
+    # For south-north analysis
+    {
+        if (direction == "South-North")
+            birdsData <- feathers %>%
+            filter(colID == dir.use[j]) %>%
+            mutate(direction = direction,
+                   dirID = dir.use[j])
+    }
 
 
 
+    if (nrow(birdsData) < min.samp.sites) {
+        next(print(paste0("Not enough data to analyze. Skipping j-loop ", dir.use[j])))
+    }
 
-# VX.  Analyze the data ---------------------------------------------------
-    # We are still in the j-loop, by the way.
 
-    for (i in 1:length(years.use)) {
+    # VX.  Analyze the data ---------------------------------------------------
+
+    for (i in 1:length(years.use))
+    {
         # a. Subset the data according to year, colID, rowID, state, country, etc.x
-        birdData <- birdData %>%
-            filter(year == years.use[i],
-                  colID == cols.use[j]) %>%
+        birdData <- birdsData %>%
+            filter(year == years.use[i]) %>%
             dplyr::rename(variable = aou,
                           value = stoptotal)
 
-        if (nrow(birdData) == 0) {
+
+
+        if (nrow(birdData) == 0)
+        {
             next
         }
+
 
         # b. Munge the data further
         source(paste0(getwd(), "/otherScripts/mungeSubsetData.R"))
@@ -235,75 +241,114 @@ for (j in 1:length(dir.use)){
 
         # X.   Calculate the metrics ---------------------------------------------------
         ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
-        calculateMetrics(dataIn = dataIn, metrics.to.calc = metrics.to.calc, timeVar = timeVar)
+        suppressMessages(calculateMetrics(dataIn = birdData, metrics.to.calc = metrics.to.calc))
 
-    }
-}
+        print(paste0("End i-loop (years) ", i, " of",  length(years.use)))
+
+    } # end i-loop
+
+    print(paste0("End j-loop (transects) ", j, " of",  length(dir.use)))
+} # end j-loop
 
 
-# XI. Import and munge results --------------------------------------------------------
+
+################ PART V: VISUALIZE THE METRICS  #########################################################
+# XI.   Import results --------------------------------------------------------
 
 # a. Import EWS results
 results_ews <-
-    importResults(resultsDir = resultsDir, myPattern = 'ews')
-## FYI: varible should be missing (NA) for metricTypes fi and VI
+    importResults(resultsDir = resultsDir, myPattern = 'ews') %>%
+    # assign the end of the window as the cellID
+    mutate(cellID = cellID_max)
 
+## FYI: varibles will liekly be missing (NA) for metricTypes FI and VI, because these are calculated across ALL variables at a time...
 
 # b. Import distance results
 results_dist <-
-    importResults(resultsDir = resultsDir, myPattern = 'South')
+    importResults(resultsDir = resultsDir, myPattern = 'distances')
 
-# c. Get the spatial sampling grid coordinates
-coords_grd <- cbind(routes_gridList$sp_grd@data, coordinates(routes_gridList$sp_grd)) %>%
+
+# X.    Create spatial results data -------------------------
+
+# a. Get the spatial sampling grid coordinates
+coords_grd <-
+    cbind(routes_gridList$sp_grd@data,
+          coordinates(routes_gridList$sp_grd)) %>%
     rename(lat = s2,
            long = s1,
            cellID  = id)
 
-# d. Join coords_grd with results_dist
+# b. Join coords_grd with results
 # note: a full join will likely produce many cells with NO results data..
 # but NO lat or long should == NA!
 distResults <-
-    full_join(
-        coords_grd,
-        results_dist %>% dplyr::select(metricType, metricValue, cellID, year, rowID)
-    ) %>%  na.omit(metricType)
+    full_join(coords_grd,
+              results_dist) %>%
+    na.omit(metricType)
 
-## Define the coordinates
-coordinates(distResults) <- c("long", "lat")
+ewsResults <-
+    full_join(coords_grd,
+              results_ews) %>%
+    na.omit(metricType) %>%
+    dplyr::select(-cellID_min,-cellID_max, -winStart  , -winStop)
 
+# c. Join the distance and the ews results!
+allResults <- full_join(distResults, ewsResults)
 
-# Set projection to WGS84 lat long friendly
-sp::proj4string(distResults) <-
+# d. Set coordinate system and projection
+coordinates(allResults) <- coordinates(distResults) <-
+    coordinates(ewsResults) <- c("long", "lat")
+sp::proj4string(allResults) <-
+    sp::proj4string(distResults) <-
+    sp::proj4string(ewsResults) <-
     sp::CRS("+proj=longlat +datum=WGS84")
 
 
-# e. Join coords_grd with results_ews
-## TBD
+# XI.  Parameter specification --------------------------------------------
 
-## TESTING SPATIAL PLOTTING
-# plot the results data on top of the grid map
-ggplot(distResults@data)+
-    geom_point(aes(x= year, y = metricValue))
+plotResults <- allResults
+year.ind <- unique(plotResults@data$year)
+sortVar.lab <-
+    ifelse(unique(plotResults@data$direction) == "South-North",
+           "latitude",
+           "longitude")
 
-plot(distResults)
-points(distResults, pch=16, cex=0.7, col="blue")
+# XII.  2D PLOTS  ------------------------------------------------------
 
+sort.year.line(plotResults, metric.ind, year.ind)
 
-################ PART V: VISUALIZE THE METRICS  #########################################################
-# X. Visualize results ----------------------------------------------------
+# XII.  Spatially explicit plots ------------------------------------------
+
+# get u.s. state data
+us <- getData('GADM', country = 'US', level = 1)
+
+# check the CRS to know which map units are used
+proj4string(us)
+proj4string(plotResults)
+
+# plot US
+plot(us)
+
+raster(plotResults)
+str(plotResults)
+
+plot(grid, pch = ".", add = T)
+
+# X. EXTRA PLOTS ----------------------------------------------------
 
 # years.use = c( 2015)
 
 # a. Plot distances
-results.to.plot <- results_dist %>%
-    filter(year %in% years.use) %>%
+results.to.plot <- allResults %>%
+    filter(year %in% years.use,
+           analysisInd = "distances") %>%
     left_join(routes_gridList$routes_grid)
 
 
 ggplot(results.to.plot) +
     geom_line(aes(x = long,
                   y = metricValue, color = as.factor(year))) +
-    facet_wrap( ~ metricType, scales = "free_y")
+    facet_wrap(~ metricType, scales = "free_y")
 
 
 # b. Plot ews
@@ -315,4 +360,4 @@ ggplot(results.to.plot %>%
            filter(metricType %in% metrics.to.plot)) +
     geom_line(aes(x = winStart,
                   y = metricValue, color = as.factor(year))) +
-    facet_wrap( ~ metricType , scales = "free_y", ncol = 1)
+    facet_wrap(~ metricType , scales = "free_y", ncol = 1)

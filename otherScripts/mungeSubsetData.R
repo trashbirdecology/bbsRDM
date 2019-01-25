@@ -1,45 +1,24 @@
-# A. For temporal analyses:
-if(analySpatTemp == "temporal"){
-    dataIn <- birdData %>%
-        dplyr::rename(time = year)
-    # %>%
-    #     dplyr::select(-long, -lat)
-    timeVar = 'year'
-    stateInd = unique(birdData$statenum)
-    routeInd = unique(birdData$route)
-    if((length(stateInd) + length(routeInd))!=2){stop("dataIn is incorrect: check filtering.")}
-}
 
-# B. For spatial analyses:
-if(analySpatTemp == "East-West"){
-    dataIn <- birdData %>%
-        dplyr::rename(time = long)
-    # %>%
-    #     dplyr::select(-year, -lat)
-    timeVar = 'long'
-    rowInd = unique(birdData$rowID)
-    yearInd = unique(birdData$year)
+if(direction == "East-West"){
+    birdData <- birdData %>%
+        dplyr::rename(sortVar = long)
+
     if(length(rowInd)!=1){stop("dataIn is incorrect: check filtering.")}
 }
-if(analySpatTemp == "South-North"){
-    dataIn <- birdData %>%
-        dplyr::rename(time = lat)
-    # %>%
-    #     dplyr::select(-year, -long)
-    timeVar = 'lat'
-    colInd = unique(birdData$colID)
-    yearInd = unique(birdData$year)
+if(direction == "South-North"){
+    birdData <- birdData %>%
+        dplyr::rename(sortVar = lat)
+
     if(length(colInd)!=1){stop("dataIn is incorrect: check filtering.")}
 }
 
 
-dataIn <- dataIn %>%
-    dplyr::select(
-        time, variable, value, cellID) %>%
-    # need to arrange by time to make sure the distances are calculated correctly!
-    dplyr::group_by(variable, time, cellID) %>%
+birdData <- birdData %>%
+   # sum over species/sites to account for hybrid and UNID races
+    dplyr::group_by(sortVar, cellID, direction, dirID, variable,year) %>%
     summarise(value = sum(value)) %>%
     dplyr::group_by(variable) %>%
-    arrange(variable, time) %>%
+    # need to arrange by time to make sure the distances are calculated correctly!
+    arrange(variable, sortVar) %>%
     ungroup()
 

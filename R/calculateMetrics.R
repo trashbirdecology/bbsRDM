@@ -1,7 +1,9 @@
 #' @title Calculate regime detection metrics
 #' @description Calculates regime detection metrics across space or time. Calculates distance travelled, Fisher Information, Variance Index, Coefficient of Variation, mean, standard deviation, variance,skewness, and kurtosis. #' @param dataIn A data frame containing columns c(variable, time, value).
 #' @param metrics.to.calc One or more of c("distances", "ews")
+#' @param A data frame with columns: sortVar (the sorting variable; latitude or longitude),  cellID (cell ID for the spatial grid),  variable (species),  value (count data).
 #' @param min.samp.sites Minimum number of unique sites in the transect (or unique times along the time series) required to analyze the data. Most metrics can be calculated using three data points, although we do not nrecommend this.
+#' @param direction Direction of the analysis (South-North or East-West)
 #' @export calculateMetrics
 #' @example
 
@@ -9,52 +11,49 @@ calculateMetrics <-
     function(dataIn,
              metrics.to.calc = c("distances", "ews"),
              min.samp.sites = 8,
-             timeVar = NULL) {
-        ## Munge the input data a little --this is a failsafe!
-        # keep only the relevant columns
-        dataIn  <- dataIn %>%
-            dplyr::select(time, variable, value, cellID) %>%
-            # add up any species having multiple observations -- this happens esp. for hybrids! is common.
-            group_by(variable, time, cellID) %>%
-            summarise(value = sum(value)) %>%
-            ungroup()
-
-        ## create an id for joining the results with cell ID.
-        id <- dataIn %>% dplyr::select(time, cellID) %>% distinct()
+             direction,
+             yearInd = years.use[i]) {
+        # Create an id for joining the results with cell ID.
+        id <- dataIn %>% dplyr::select(sortVar, cellID, direction, dirID, year) %>% distinct()
+        dirID  = unique(id$dirID)
+        direction  = unique(id$direction)
+        year  = years.use[i]
 
 
-
-        if(length(unique(dataIn$time)) < min.samp.sites){
-             flag = "# dataIn$time points < min.samp.sites. Not calculating metrics. "
+        # Abandon calcs if not enough data
+        if (length(unique(dataIn$sortVar)) < min.samp.sites) {
+            flag = "# dataIn$time points < min.samp.sites. Not calculating metrics. "
             return(flag)
         }
 
-        ## Calculate distance traveled
+        # Calculate distance traveled
         if ("distances" %in% metrics.to.calc) {
             metricInd = "distances"
+
             # keep only the relevant columns
-            dataIn  <- dataIn %>%
-                dplyr::select(time, variable, value, cellID)
-            if (!length(unique(dataIn$time)) < min.samp.sites) {
+            dataInDist  <- dataIn %>%
+                dplyr::select(sortVar, cellID, variable, value)
+            if (!length(unique(dataIn$sortVar)) < min.samp.sites) {
                 # Calc distances
                 results <- NULL
-                results <- calculate_distanceTravelled(dataIn, derivs = T) %>%
-                    gather(key = 'metricType', value = 'metricValue',-time)
+                results <-
+                    calculate_distanceTravelled(dataInDist, derivs = T) %>%
+                    gather(key = 'metricType', value = 'metricValue', -sortVar, -cellID)
 
-                # Add the cellID back onto the results
-                id <- dataIn %>% dplyr::select(time, cellID) %>% distinct()
-
-                results <- left_join(results, id)
 
                 # Save the results, if exist
-                if(!exists("results") | !is.null(results)){
-                saveMyResults(
-                    results ,
-                    resultsDir = resultsDir,
-                    analySpatTemp = analySpatTemp,
-                    metricInd = metricInd,
-                    timeVar = timeVar
-                )}
+                if (!exists("results") | !is.null(results)) {
+
+                    # Add the identifiers back onto the results
+                    results <- left_join(results, id)
+
+                     saveMyResults(
+                        results ,
+                        resultsDir = resultsDir,
+                        metricInd = metricInd,
+                        yearInd
+                    )
+                }
 
             }
         }
@@ -64,22 +63,14 @@ calculateMetrics <-
         if ("ews" %in% metrics.to.calc) {
             metricInd = "ews"
 
-            # keep only the relevant columns
-            dataIn  <- dataIn %>%
-                dplyr::select(time, variable, value) %>%
-                # add up any species having multiple observations -- this happens esp. for hybrids! is common.
-                group_by(variable, time) %>%
-                summarise(value = sum(value)) %>%
-                ungroup()
+            dataInRDM  <- dataIn %>%
+                dplyr::select(sortVar, cellID, variable, value)
 
+                    # create empty df for results
             results <- NULL
             results <-
-                rdm_window_analysisTEMP(
-                    dataInRDM = dataIn %>%
-                        # arrange the data in temporal (spatial) order
-                        dplyr::group_by(variable) %>%
-                        arrange(variable, time) %>%
-                        ungroup(),
+                rdm_window_analysis(
+                    dataInRDM = dataInRDM,
                     winMove = winMove,
                     overrideSiteErr = F,
                     fi.equation = fi.equation,
@@ -89,17 +80,23 @@ calculateMetrics <-
                 )
 
 
+
             # Save the results, if exist
-            if(!exists("results") | !is.null(results)){
-            saveMyResults(
-                results ,
-                resultsDir = resultsDir,
-                analySpatTemp = analySpatTemp,
-                metricInd = metricInd,
-                timeVar = timeVar
-            )}
+            if (!exists("results") | !is.null(results)) {
 
+                # Add the identifiers back onto the results
+                results <- results %>%
+                    mutate(direction =direction,
+                           dirID = dirID,
+                           year = yearInd)
+
+                saveMyResults(
+                    results ,
+                    resultsDir = resultsDir,
+                    metricInd = metricInd,
+                    yearInd
+                )
+            }
         } # leave EWS calculations
-
 
     } # leave function
