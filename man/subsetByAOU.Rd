@@ -4,13 +4,13 @@
 \alias{subsetByAOU}
 \title{Subset the BBS data by species, functional traits, and/or body mass.}
 \usage{
-subsetByAOU(myData, subset.by = c("keep.diurnal", "remove.fowl",
-  "remove.shorebirds", "remove.shoreWaderFowl"))
+subsetByAOU(myData, subset.by = c("remove.fowl", "remove.shorebirds",
+  "remove.shoreWaderFowl"))
 }
 \arguments{
 \item{myData}{A data frame including the column "aou".}
 
-\item{subset.by}{One or more of   c("keep.diurnal", 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl').}
+\item{subset.by}{One or more of 'remove.fowl' (removes waterfowl), "remove.shorebirds" (removes shorebirds and waders),  'remove.shoreWaderFowl' (removes shorebirds, waders, and fowl).}
 
 \item{mass}{Logical. Retrieves body mass information (Dunning reference).}
 }

@@ -4,17 +4,17 @@
 \alias{createSamplingGrid}
 \title{Generate a sampling grid (rectangular) for regions in North America.}
 \usage{
-routes_gridList <- createSamplingGrid(cs = c(0.5, 0.5))
+routes_gridList <- createSamplingGrid(cs = c(1,1))
 }
 \arguments{
-\item{cs}{Cell size (in degree lat, long). Default is 0.5 degree long by 0.5 degree lat. In this region, 1 deg latitude ~= 69 miles & 1 deg longitude ~= 55 miles. The total length of a BBS route is ~50 miles. Caution when using degrees > 1, as multiple routes can fall into a single cell.}
+\item{cs}{Cell size (in degree lat, long). Default is 0.5 degree long by 0.5 degree lat. In this region, 1 deg latitude ~= 69 miles & 1 deg longitude ~= 55 miles. The total length of a BBS route is ~50 miles. Caution when using degrees < 1 by 1 degree as a single route could fal into multiple cells...}
 
 \item{bbLat}{Min and max (in any order) latitude coordinates for the bounding box. The function removes routes (lat,long) falling outside these coordinates.  Default = c(23, 51). See also 'bbLong'.}
 
 \item{bbLong}{Min and max (in any order) longitude for the bounding box. The function removes routes (lat,long) falling outside these coordinates. Default = c(23, 51). See also 'bbLat'.}
 }
 \description{
-Creates a sampling grid across the continental united states and assign BBS routes to specific a row and column ID. If cs < 0.5^2 there's a chance a cell contains more than one BBS route.
+Creates a sampling grid across the continental united states and assign BBS routes to specific a row and column ID.
 }
 \keyword{bbs,}
 \keyword{routes}

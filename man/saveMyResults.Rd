@@ -4,14 +4,12 @@
 \alias{saveMyResults}
 \title{Save results from distance travelled}
 \usage{
-saveMyResults(results, resultsDir, analySpatTemp, metricInd)
+saveMyResults(results, resultsDir, metricInd)
 }
 \arguments{
 \item{results}{A data frame or list element with columns 'time', 'metricType', and 'metricValue' for either the EWS or Distance results.}
 
 \item{resultsDir}{Where to save the feather.}
-
-\item{analySpatTemp}{One of 'temporal', 'East'West', or 'South-North' to specify the type of analysis. Will be used in filename.}
 
 \item{metricInd}{One of 'distances' or 'ews'. Used in outfile name.}
 }

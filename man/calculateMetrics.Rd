@@ -4,13 +4,17 @@
 \alias{calculateMetrics}
 \title{Calculate regime detection metrics}
 \usage{
-calculateMetrics(dataIn = dataIn, metrics.to.calc = c("distances",
-  "ews"), min.samp.sites = 8)
+calculateMetrics(dataIn, metrics.to.calc = c("distances", "ews"),
+  min.samp.sites = 8, direction = direction, yearInd)
 }
 \arguments{
 \item{metrics.to.calc}{One or more of c("distances", "ews")}
 
 \item{min.samp.sites}{Minimum number of unique sites in the transect (or unique times along the time series) required to analyze the data. Most metrics can be calculated using three data points, although we do not nrecommend this.}
+
+\item{direction}{Direction of the analysis (South-North or East-West)}
+
+\item{A}{data frame with columns: sortVar (the sorting variable; latitude or longitude),  cellID (cell ID for the spatial grid),  variable (species),  value (count data).}
 }
 \description{
 Calculates regime detection metrics across space or time. Calculates distance travelled, Fisher Information, Variance Index, Coefficient of Variation, mean, standard deviation, variance,skewness, and kurtosis. #' @param dataIn A data frame containing columns c(variable, time, value).
