@@ -10,7 +10,7 @@
 importResults <- function(resultsDir, myPattern) {
     results <- NULL
     files = list.files(paste0(resultsDir,myPattern))
-    print(paste0("I am importing " , length(files) , " files."))
+    print(paste0("I am importing " , length(files) , " files. Does this sound right?!"))
 
     for(i in 1:length(files) ){
         feather = NULL
