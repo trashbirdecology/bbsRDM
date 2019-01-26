@@ -11,13 +11,10 @@ calculateMetrics <-
     function(dataIn,
              metrics.to.calc = c("distances", "ews"),
              min.samp.sites = 8,
-             direction,
-             yearInd = years.use[i]) {
+             direction = direction,
+             yearInd ) {
         # Create an id for joining the results with cell ID.
         id <- dataIn %>% dplyr::select(sortVar, cellID, direction, dirID, year) %>% distinct()
-        dirID  = unique(id$dirID)
-        direction  = unique(id$direction)
-        year  = years.use[i]
 
 
         # Abandon calcs if not enough data
@@ -42,7 +39,7 @@ calculateMetrics <-
 
 
                 # Save the results, if exist
-                if (!exists("results") | !is.null(results)) {
+                if (exists("results") & !is.null(results)) {
 
                     # Add the identifiers back onto the results
                     results <- left_join(results, id)
@@ -50,8 +47,7 @@ calculateMetrics <-
                      saveMyResults(
                         results ,
                         resultsDir = resultsDir,
-                        metricInd = metricInd,
-                        yearInd
+                        metricInd = metricInd
                     )
                 }
 
@@ -82,7 +78,7 @@ calculateMetrics <-
 
 
             # Save the results, if exist
-            if (!exists("results") | !is.null(results)) {
+            if (exists("results") & !is.null(results)) {
 
                 # Add the identifiers back onto the results
                 results <- results %>%
