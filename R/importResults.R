@@ -7,19 +7,25 @@
 #' @return A dataframe
 #' @export
 
-importResults <- function(resultsDir, myPattern) {
+importResults <- function(resultsDir, myPattern, subset.by = NULL) {
     results <- NULL
     files = list.files(paste0(resultsDir,myPattern))
+
+            if(!is.null(subset.by)){
+                files <- files[str_detect(files, subset.by)]
+            }
+
     print(paste0("I am importing " , length(files) , " files. Does this sound right?!"))
 
     for(i in 1:length(files) ){
+
         feather = NULL
 
         feather <-read_feather(path = paste0(resultsDir, myPattern,"/", files[i]))
 
         results = rbind(feather, results)
-    }
 
+            }
 
 
     results <- results %>% mutate(analysis = as.factor(myPattern)) %>%

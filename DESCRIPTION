@@ -5,7 +5,7 @@ Version: 0.1.0
 Author: Jessica Burnett
 Maintainer: Jessica Burnett <jessicaleighburnett@Gmail.com>
 Description: 
-    Calculates regime detection metrics using North American Breeding Bird Survey data using either time series or spatial transects. License: MIT +
+    Calculates regime detection metrics using North American Breeding Bird Survey data across North-South and East-West spatial transects. License: MIT +
 Encoding: UTF-8
 LazyData: true
 Depends:
@@ -18,9 +18,9 @@ Depends:
     here, 
     feather, 
     kedd,
-    devtools
+    devtools, 
+    caTools
 Imports:
-    tictoc
 RoxygenNote: 6.1.1
 Suggests: 
     knitr,
