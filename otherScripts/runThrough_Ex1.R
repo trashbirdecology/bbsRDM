@@ -15,8 +15,7 @@ library(raster)
 library(feather)
 library(bbsRDM)
 library(feather)
-# devtools::install_github("collectivemedia/tictoc", force = F)  # Optional but must silence tic()s and toc()s in following lines
-library(tictoc)
+
 
 # II:   Directories   ---------------------------------------------------
 
@@ -106,7 +105,7 @@ gridded(routes_gridList$sp_grd)
 ### FYI: ~ 1/2 minutes to upload ALL BBS DATA; ~350MB as feather object
 
 feathers <- NULL
-for (i in 1:length(list.files(bbsDir))) {
+suppressMessages(for (i in 1:length(list.files(bbsDir))) {
     feather <- NULL
     feather <- loadBirdFeathers(newDir  = bbsDir,
                                 filename = list.files(bbsDir)[i]) %>%
@@ -116,7 +115,7 @@ for (i in 1:length(list.files(bbsDir))) {
 
     feathers <- rbind(feathers, feather)
     rm(feather)
-}
+})
 print(object.size(feathers), units = "auto")
 
 
@@ -156,53 +155,46 @@ feathers <- subsetByAOU(myData = feathers, 'remove.shoreWaderFowl')
 # # Option 1; Interactive inputs for parameters
 # source(paste0(getwd(), '/otherScripts/interactCalcRDM.R'))
 
-
 # Option 2: Manually define parameters for regimeDetectionMeasures functions.
 metrics.to.calc <- c("ews", "distances")
 direction <-
-    "South-North"
-# "East-West" # choose one of : 'South-North', 'East-West', or 'temporal'
+    "East-West"
+# "East-West" # choose one of : 'South-North', 'East-West'
 fill = 0 # Fills in missing species counts with ZERO.
 min.samp.sites = 8
 min.window.dat = 3
 fi.equation = "7.12"
-winMove = 0.10
+winMove = 0.25
 to.calc = c("EWS", "FI", "VI")
 
 
 # Get all possible years
 years.use = unique(feathers$year)
 # keep only the years divisible by 5
-years.use  <- years.use[which(years.use %% 5 == 0)] %>% sort()
+years.use  <- years.use[which(years.use %% 5 == 0 & years.use > 1975)] %>% sort()
 
 # Define some filtering and labeling parameters based on direction of spatial analysis (if applicable)
 if (direction == "South-North") {
-    dir.use =  unique(feathers$rowID) %>% na.omit(rowID) %>% sort()
+    dir.use =  unique(feathers$colID) %>% na.omit(colID) %>% sort()
 
 }
-
-
 if (direction == "East-West") {
-    dir.use = unique(feathers$colID) %>% na.omit(colID) %>% sort()
+    dir.use = unique(feathers$rowID) %>% na.omit(rowID) %>% sort()
 }
-
 
 
 # VIX:  Conduct analyses  -----------------------------------------------------
-
-## First, filter the data by dir.use indices and munge
+## About 5 minutes run time for all transects in one direction!
 for (j in 1:length(dir.use)) {
     # For east-west analysis
-    {
-        if (direction == "East-West")
+        if (direction == "East-West"){
             birdsData <- feathers %>%
                 filter(rowID == dir.use[j]) %>%
                 mutate(direction = direction,
                        dirID = dir.use[j])
     }
     # For south-north analysis
-    {
-        if (direction == "South-North")
+        if (direction == "South-North"){
             birdsData <- feathers %>%
             filter(colID == dir.use[j]) %>%
             mutate(direction = direction,
@@ -218,8 +210,7 @@ for (j in 1:length(dir.use)) {
 
     # VX.  Analyze the data ---------------------------------------------------
 
-    for (i in 1:length(years.use))
-    {
+    for (i in 1:length(years.use)){
         # a. Subset the data according to year, colID, rowID, state, country, etc.x
         birdData <- birdsData %>%
             filter(year == years.use[i]) %>%
@@ -228,26 +219,24 @@ for (j in 1:length(dir.use)) {
 
 
 
-        if (nrow(birdData) == 0)
-        {
+        if (nrow(birdData) == 0){
             next
         }
 
-
         # b. Munge the data further
-        source(paste0(getwd(), "/otherScripts/mungeSubsetData.R"))
-        # This script will produce a dataset called `dataIn`, and will fill paramters for labeling.
+        birdData <- mungeSubsetData(birdData)
 
 
         # X.   Calculate the metrics ---------------------------------------------------
         ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
-        suppressMessages(calculateMetrics(dataIn = birdData, metrics.to.calc = metrics.to.calc))
 
-        print(paste0("End i-loop (years) ", i, " of",  length(years.use)))
+        suppressMessages(calculateMetrics(dataIn = birdData, metrics.to.calc = metrics.to.calc, yearInd = years.use[i]))
+
+        print(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
 
     } # end i-loop
 
-    print(paste0("End j-loop (transects) ", j, " of",  length(dir.use)))
+    print(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
 } # end j-loop
 
 
@@ -257,7 +246,8 @@ for (j in 1:length(dir.use)) {
 
 # a. Import EWS results
 results_ews <-
-    importResults(resultsDir = resultsDir, myPattern = 'ews') %>%
+    importResults(resultsDir = resultsDir, myPattern = 'ews',
+                  subset.by = direction) %>%
     # assign the end of the window as the cellID
     mutate(cellID = cellID_max)
 
@@ -265,7 +255,7 @@ results_ews <-
 
 # b. Import distance results
 results_dist <-
-    importResults(resultsDir = resultsDir, myPattern = 'distances')
+    importResults(resultsDir = resultsDir, myPattern = 'distances', subset.by = direction)
 
 
 # X.    Create spatial results data -------------------------
@@ -292,30 +282,31 @@ ewsResults <-
     na.omit(metricType) %>%
     dplyr::select(-cellID_min,-cellID_max, -winStart  , -winStop)
 
-# c. Join the distance and the ews results!
-allResults <- full_join(distResults, ewsResults)
-
 # d. Set coordinate system and projection
-coordinates(allResults) <- coordinates(distResults) <-
+coordinates(distResults) <-
     coordinates(ewsResults) <- c("long", "lat")
-sp::proj4string(allResults) <-
-    sp::proj4string(distResults) <-
+sp::proj4string(distResults) <-
     sp::proj4string(ewsResults) <-
     sp::CRS("+proj=longlat +datum=WGS84")
 
 
 # XI.  Parameter specification --------------------------------------------
 
-plotResults <- allResults
-year.ind <- unique(plotResults@data$year)
+plotResults <- distResults
+metric.ind <- "s"
+    # c('dsdt',"s") # the metrics to print
+year.ind <- unique(plotResults@data$year) %>% sort()
 sortVar.lab <-
     ifelse(unique(plotResults@data$direction) == "South-North",
            "latitude",
            "longitude")
 
 # XII.  2D PLOTS  ------------------------------------------------------
+# Plot indiviudal transects..
+dirID.ind <- 22
+sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, scale = T, center = T)+
+    geom_vline(aes(xintercept=-85.2), color = "grey", linetype = 2)
 
-sort.year.line(plotResults, metric.ind, year.ind)
 
 # XII.  Spatially explicit plots ------------------------------------------
 

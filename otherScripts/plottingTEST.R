@@ -3,22 +3,21 @@
 library(ggplot2)
 library(viridis)
 
-test_data <- full_join(
-    coords_grd,
-    results_dist %>% dplyr::select(metricType, metricValue, cellID, year, colID)
-) %>%  na.omit(metricType) %>%
-    filter(year %in% c(1980, 1990, 2000, 2010),
-           metricType == "dsdt") %>%
-    group_by(colID, year) %>%
-    mutate(scaledMetricValue.bycol = base::scale(metricValue, center =T)) %>%
+
+test_data <- as.data.frame(plotResults) %>%
+    filter(
+        # year %in% c(1980, 1990, 2000, 2010),
+           metricType == "s") %>%
+    group_by(dirID, year, analysis) %>%
+    mutate(scaledMetricValue.bycol = base::scale(metricValue, center =T, scale = T)) %>%
     ungroup() %>%
     na.omit(metricValue)
 
-ggplot() + geom_raster(data = test_data, aes(x = long, y = lat, fill = scaledMetricValue.bycol)) +
+ggplot(test_data) + geom_raster(aes(x = long, y = lat, fill = scaledMetricValue.bycol)) +
     coord_fixed(ratio = 1) +
     scale_fill_viridis(direction = -1) +
-    facet_wrap(~year, ncol = 2, strip.position = "top") +
-    theme(legend.position = "top")
+    facet_wrap(~year, strip.position = "top", nrow=3) +
+    theme(legend.position = "none")
 
 
 ## plot the change in values over time
@@ -32,7 +31,7 @@ test_data2<-test_data %>%
 ggplot() + geom_raster(data = test_data2, aes(x = long, y = lat, fill = dScaledMetricValue.bycol)) +
     coord_fixed(ratio = 1) +
     scale_fill_viridis(direction = -1) +
-    facet_wrap(~year, ncol = 2, strip.position = "right") +
+    facet_wrap(~year, ncol = 3, strip.position = "top") +
     theme(legend.position = "none")
 
 
