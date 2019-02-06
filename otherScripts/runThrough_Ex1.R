@@ -151,8 +151,7 @@ feathers <- subsetByAOU(myData = feathers, 'remove.shoreWaderFowl')
 
 ################ PART IV: CALCULATE THE METRICS #########################################################
 # VIII: Define parameters for subsetting the data and for calculating the metrics  -------------------------
-
-# # Option 1; Interactive inputs for parameters
+# Option 1; Interactive inputs for parameters
 # source(paste0(getwd(), '/otherScripts/interactCalcRDM.R'))
 
 # Option 2: Manually define parameters for regimeDetectionMeasures functions.
@@ -183,63 +182,63 @@ if (direction == "East-West") {
 }
 
 
-# VIX:  Conduct analyses  -----------------------------------------------------
-## About 5 minutes run time for all transects in one direction!
-for (j in 1:length(dir.use)) {
-    # For east-west analysis
-        if (direction == "East-West"){
-            birdsData <- feathers %>%
-                filter(rowID == dir.use[j]) %>%
-                mutate(direction = direction,
-                       dirID = dir.use[j])
-    }
-    # For south-north analysis
-        if (direction == "South-North"){
-            birdsData <- feathers %>%
-            filter(colID == dir.use[j]) %>%
-            mutate(direction = direction,
-                   dirID = dir.use[j])
-    }
-
-
-
-    if (nrow(birdsData) < min.samp.sites) {
-        next(print(paste0("Not enough data to analyze. Skipping j-loop ", dir.use[j])))
-    }
-
-
-    # VX.  Analyze the data ---------------------------------------------------
-
-    for (i in 1:length(years.use)){
-        # a. Subset the data according to year, colID, rowID, state, country, etc.x
-        birdData <- birdsData %>%
-            filter(year == years.use[i]) %>%
-            dplyr::rename(variable = aou,
-                          value = stoptotal)
-
-
-
-        if (nrow(birdData) == 0){
-            next
-        }
-
-        # b. Munge the data further
-        birdData <- mungeSubsetData(birdData)
-
-
-        # X.   Calculate the metrics ---------------------------------------------------
-        ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
-
-        suppressMessages(calculateMetrics(dataIn = birdData, metrics.to.calc = metrics.to.calc, yearInd = years.use[i]))
-
-        print(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
-
-    } # end i-loop
-
-    print(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
-} # end j-loop
-
-
+# # VIX:  Conduct analyses  -----------------------------------------------------
+# ## About 5 minutes run time for all transects in one direction!
+# for (j in 1:length(dir.use)) {
+#     # For east-west analysis
+#         if (direction == "East-West"){
+#             birdsData <- feathers %>%
+#                 filter(rowID == dir.use[j]) %>%
+#                 mutate(direction = direction,
+#                        dirID = dir.use[j])
+#     }
+#     # For south-north analysis
+#         if (direction == "South-North"){
+#             birdsData <- feathers %>%
+#             filter(colID == dir.use[j]) %>%
+#             mutate(direction = direction,
+#                    dirID = dir.use[j])
+#     }
+#
+#
+#
+#     if (nrow(birdsData) < min.samp.sites) {
+#         next(print(paste0("Not enough data to analyze. Skipping j-loop ", dir.use[j])))
+#     }
+#
+#
+#     # VX.  Analyze the data ---------------------------------------------------
+#
+#     for (i in 1:length(years.use)){
+#         # a. Subset the data according to year, colID, rowID, state, country, etc.x
+#         birdData <- birdsData %>%
+#             filter(year == years.use[i]) %>%
+#             dplyr::rename(variable = aou,
+#                           value = stoptotal)
+#
+#
+#
+#         if (nrow(birdData) == 0){
+#             next
+#         }
+#
+#         # b. Munge the data further
+#         birdData <- mungeSubsetData(birdData)
+#
+#
+#         # X.   Calculate the metrics ---------------------------------------------------
+#         ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
+#
+#         suppressMessages(calculateMetrics(dataIn = birdData, metrics.to.calc = metrics.to.calc, yearInd = years.use[i]))
+#
+#         print(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
+#
+#     } # end i-loop
+#
+#     print(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
+# } # end j-loop
+#
+#
 
 ################ PART V: VISUALIZE THE METRICS  #########################################################
 # XI.   Import results --------------------------------------------------------
@@ -290,7 +289,7 @@ sp::proj4string(distResults) <-
     sp::CRS("+proj=longlat +datum=WGS84")
 
 
-# XI.  Parameter specification --------------------------------------------
+# XI.  Plot arameter specification --------------------------------------------
 
 plotResults <- distResults
 metric.ind <- "s"
@@ -302,13 +301,16 @@ sortVar.lab <-
            "longitude")
 
 # XII.  2D PLOTS  ------------------------------------------------------
+
+
 # Plot indiviudal transects..
-dirID.ind <- 22
-sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, scale = T, center = T)+
-    geom_vline(aes(xintercept=-85.2), color = "grey", linetype = 2)
+dirID.ind <- 13
+pl1 <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, scale = T, center = T)+
+    geom_vline(aes(xintercept=-96.8), color = "grey", linetype = 2)
 
 
 # XII.  Spatially explicit plots ------------------------------------------
+
 
 # get u.s. state data
 us <- getData('GADM', country = 'US', level = 1)

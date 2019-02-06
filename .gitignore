@@ -2,4 +2,8 @@
 .Rhistory
 bbs_raw_data
 myResults
+*.pdf
+*.md
+*.html
+
 
