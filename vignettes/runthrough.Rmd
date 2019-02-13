@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>", 
   eval=T, echo=F, 
-  cache = T
+  cache = T, warning=F, message=F
 )
 ```
 
@@ -68,7 +68,6 @@ If necessary, download all the state data. This takes 10-15 minutes, so only run
 
 ```{r getBBSdata, message=F, warning=F}
 # a. Load the regional .txt file from Patuxent's FTP server (you must be connected to the internet to perform this step)
-
 regions <- GetRegions()
 
 # b. Create a series or one filenames for states, regions

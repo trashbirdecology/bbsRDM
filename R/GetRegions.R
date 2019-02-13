@@ -1,6 +1,7 @@
 # Read in list of regions (State/Prov/TerrName), from RegionCodes.txt, and then extract list of where the 10-stop data is kept
 #' @export GetRegions
 #' @param Dir location of the BBS files. Do not change unless they make major changes.
+#' @param bbsDir Location of the folder containing bbs raw data (defined in runthrough.rmd)
 GetRegions <-
     function(Dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
              ZipFiles = TRUE) {
@@ -8,7 +9,7 @@ GetRegions <-
 
         # If the functiin doesn't work properly,  use this.
         File <- paste0(Dir, "RegionCodes.txt")
-        newDir <- here::here("bbs_raw_data/codes")
+        newDir <- paste0(bbsDir, "/codes")
         dir.create(newDir)
         # Download regionCodes.txt
         download.file(url = File,
@@ -23,7 +24,7 @@ GetRegions <-
 
         # Get zipfile names
         File <- paste0(Dir, "README.txt")
-        newDir <- here::here("bbs_raw_data/codes")
+        newDir <- paste0(bbsDir,"/codes")
         dir.create(newDir)
         # Download regionCodes.txt
 
