@@ -4,11 +4,11 @@ sort.year.line <-
              metric.ind,
              year.ind,
              dirID.ind,
-             dirInd,
+             direction,
              scale = T,
              center = T) {
         sortVar.lab <-
-            ifelse( dirInd == "South-North",
+            ifelse( direction == "South-North",
                    "latitude",
                    "longitude")
         data <-
@@ -16,7 +16,7 @@ sort.year.line <-
             filter(metricType %in% metric.ind,
                    year %in% year.ind,
                    dirID %in% dirID.ind ,
-                   direction == dirInd)
+                   direction == direction)
 
         if (scale == T | center == T) {
             data <-

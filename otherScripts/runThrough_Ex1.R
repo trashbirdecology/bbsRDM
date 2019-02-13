@@ -310,10 +310,9 @@ pl1 <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, scale = T, c
 
 
 # XII.  Spatially explicit plots ------------------------------------------
-
-
 # get u.s. state data
 us <- getData('GADM', country = 'US', level = 1)
+?getData
 
 # check the CRS to know which map units are used
 proj4string(us)

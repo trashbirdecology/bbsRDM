@@ -188,7 +188,7 @@ metrics.to.calc <- c("distances", "ews")
 to.calc = c("EWS", "FI", "VI")
 
 # Choose spatial or temporal analysis
-analySpatTemp <-
+direction <-
     "South-North" # choose one of : 'South-North', 'East-West', or 'temporal'
 
 # Choose the fill value for species present in the entire time series (or sampling transect) but not present on that year. Using "NA" assumes the species with missing data *was not and could not have been present*. Using zero assumes the species could have been present but was not.
@@ -206,9 +206,8 @@ fi.equation = "7.12"
 # By what % of the entire data should the window move? 
 winMove = 0.25
 
-direction = "East-West"
-
 # Define some filtering and labeling parameters based on direction of spatial analysis (if applicable)
+
 if (direction == "South-North") {
     dir.use =  unique(feathers$colID) %>% na.omit(colID) %>% sort()}
 if (direction == "East-West") {
@@ -305,263 +304,6 @@ results_ews <-
 #  Import distance results
 results_dist <-
     importResults(resultsDir = resultsDir, myPattern = 'distances', subset.by = direction)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ```
 
 Next, get the results to align with our sampling grid for visualizing results across space.
@@ -625,14 +367,14 @@ Plot individual transects
 ```{r , echo=F, eval=T, warning=F, message=F}
 # Specify the transect # we want to see
 dirID.ind <- 13
-dirInd <- "East-West"
+
 metric.ind <- "s"
 
 
 pl1 <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T)+
     # place a v-line at the 
      geom_vline(aes(xintercept=-96.8), color = "grey", linetype = 2)
-
+pl1
 
 ```
 
