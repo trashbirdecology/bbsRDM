@@ -19,6 +19,7 @@ saveMyResults <- function(results,
         x = results,
         path = paste0(
             resultsDir,
+            "/",
             metricInd,
             "/",
             fileNameInd,

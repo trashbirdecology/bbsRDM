@@ -6,7 +6,7 @@
 
 loadBirdFeathers <- function(newDir, filename) {
 
-    # Create the new filename as .feather
+        # Create the new filename as .feather
     filename = gsub(".zip" , ".feather", filename)
 
 
@@ -14,5 +14,6 @@ loadBirdFeathers <- function(newDir, filename) {
 
     return(feather)
 }
+
 
 

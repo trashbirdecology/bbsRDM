@@ -1,7 +1,7 @@
 #' @title Calculate regime detection metrics
 #' @description Calculates regime detection metrics across space or time. Calculates distance travelled, Fisher Information, Variance Index, Coefficient of Variation, mean, standard deviation, variance,skewness, and kurtosis. #' @param dataIn A data frame containing columns c(variable, time, value).
 #' @param metrics.to.calc One or more of c("distances", "ews")
-#' @param A data frame with columns: sortVar (the sorting variable; latitude or longitude),  cellID (cell ID for the spatial grid),  variable (species),  value (count data).
+#' @param dataIn data frame with columns: sortVar (the sorting variable; latitude or longitude),  cellID (cell ID for the spatial grid),  variable (species),  value (count data).
 #' @param min.samp.sites Minimum number of unique sites in the transect (or unique times along the time series) required to analyze the data. Most metrics can be calculated using three data points, although we do not nrecommend this.
 #' @param direction Direction of the analysis (South-North or East-West)
 #' @export calculateMetrics
@@ -11,11 +11,11 @@ calculateMetrics <-
     function(dataIn,
              metrics.to.calc = c("distances", "ews"),
              min.samp.sites = 8,
-             direction = direction,
-             yearInd ) {
+             direction,
+             yearInd,
+             to.calc = c("EWS", "FI", "VI")) {
         # Create an id for joining the results with cell ID.
         id <- dataIn %>% dplyr::select(sortVar, cellID, direction, dirID, year) %>% distinct()
-
 
         # Abandon calcs if not enough data
         if (length(unique(dataIn$sortVar)) < min.samp.sites) {
@@ -49,6 +49,7 @@ calculateMetrics <-
                         resultsDir = resultsDir,
                         metricInd = metricInd
                     )
+                rm(results)
                 }
 
             }
@@ -83,15 +84,16 @@ calculateMetrics <-
                 # Add the identifiers back onto the results
                 results <- results %>%
                     mutate(direction =direction,
-                           dirID = dirID,
+                           dirID = unique(id$dirID),
                            year = yearInd)
 
                 saveMyResults(
                     results ,
                     resultsDir = resultsDir,
-                    metricInd = metricInd,
-                    yearInd
+                    metricInd = metricInd
                 )
+
+                rm(results)
             }
         } # leave EWS calculations
 

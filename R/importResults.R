@@ -10,7 +10,7 @@
 
 importResults <- function(resultsDir, myPattern, subset.by = NULL) {
     results <- NULL
-    files = list.files(paste0(resultsDir,myPattern))
+    files = list.files(paste0(resultsDir, "/", myPattern))
 
             if(!is.null(subset.by)){
                 files <- files[str_detect(files, subset.by)]
@@ -22,7 +22,7 @@ importResults <- function(resultsDir, myPattern, subset.by = NULL) {
 
         feather = NULL
 
-        feather <-read_feather(path = paste0(resultsDir, myPattern,"/", files[i]))
+        feather <-read_feather(path = paste0(resultsDir, "/", myPattern,"/", files[i]))
 
         results = rbind(feather, results)
 

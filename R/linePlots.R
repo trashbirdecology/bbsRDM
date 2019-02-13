@@ -4,17 +4,19 @@ sort.year.line <-
              metric.ind,
              year.ind,
              dirID.ind,
+             dirInd,
              scale = T,
              center = T) {
         sortVar.lab <-
-            ifelse(unique(df@data$direction) == "South-North",
+            ifelse( dirInd == "South-North",
                    "latitude",
                    "longitude")
         data <-
             df@data %>%
             filter(metricType %in% metric.ind,
                    year %in% year.ind,
-                   dirID %in% dirID.ind)
+                   dirID %in% dirID.ind ,
+                   direction == dirInd)
 
         if (scale == T | center == T) {
             data <-
@@ -28,7 +30,6 @@ sort.year.line <-
                 print("Data were mean-centered.")
             if (scale == F & center == T)
                 print("Data were 0-1 scaled.")
-
 
         }
 
@@ -66,10 +67,3 @@ sort.year.line <-
 
 
 
-# Compare metrics ---------------------------------------------------------
-
-plot.multimetrics <- function(df){
-
-
-
-}

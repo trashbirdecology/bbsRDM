@@ -5,9 +5,9 @@ rm(list = ls())
 
 
 ## Re-install `regimDetectionMeasures` often as this package is under major development.
-devtools::install_github("trashbirdecology/regimedetectionmeasures",
-                         force = T,
-                         dep = F)
+# devtools::install_github("trashbirdecology/regimedetectionmeasures",
+#                          force = T,
+#                          dep = F)
 
 library(regimeDetectionMeasures)
 library(sp)
@@ -128,22 +128,22 @@ print(object.size(feathers), units = "auto")
 print("This is the data we will work with hereafter.")
 head(feathers)
 
-# # VI: OPTIONAL Subset by the functional traits and body mass data ----------------------
-#
-#
-# # Load the functional trait and mass data, and munge/merge
-# funMass <-
-#     funcMass(dataWD = paste0(getwd(), "/data"),
-#              fxn = T,
-#              mass = F)
-#
-# # Combine the two datasets
-# bbsData <-
-#     mergeFunMassBBS(bbsData = feather, funMass = funMass)
-# rm(funMass)
+# VI: OPTIONAL Subset by the functional traits and body mass data ----------------------
+
+
+# Load the functional trait and mass data, and munge/merge
+funMass <-
+    funcMass(dataWD = paste0(getwd(), "/data"),
+             fxn = T,
+             mass = F)
+
+# Combine the two datasets
+bbsData <-
+    mergeFunMassBBS(bbsData = feather, funMass = funMass)
+rm(funMass)
 # rm(funMass, feather)
-#
-#
+
+
 # VII:  Subset by AOU codes ------------------------------------------------
 
 feathers <- subsetByAOU(myData = feathers, 'remove.shoreWaderFowl')
@@ -167,8 +167,8 @@ winMove = 0.25
 to.calc = c("EWS", "FI", "VI")
 
 
-# Get all possible years
-years.use = unique(feathers$year)
+    # Get all possible years
+    years.use = unique(feathers$year)
 # keep only the years divisible by 5
 years.use  <- years.use[which(years.use %% 5 == 0 & years.use > 1975)] %>% sort()
 
@@ -183,62 +183,62 @@ if (direction == "East-West") {
 
 
 # # VIX:  Conduct analyses  -----------------------------------------------------
-# ## About 5 minutes run time for all transects in one direction!
-# for (j in 1:length(dir.use)) {
-#     # For east-west analysis
-#         if (direction == "East-West"){
-#             birdsData <- feathers %>%
-#                 filter(rowID == dir.use[j]) %>%
-#                 mutate(direction = direction,
-#                        dirID = dir.use[j])
-#     }
-#     # For south-north analysis
-#         if (direction == "South-North"){
-#             birdsData <- feathers %>%
-#             filter(colID == dir.use[j]) %>%
-#             mutate(direction = direction,
-#                    dirID = dir.use[j])
-#     }
-#
-#
-#
-#     if (nrow(birdsData) < min.samp.sites) {
-#         next(print(paste0("Not enough data to analyze. Skipping j-loop ", dir.use[j])))
-#     }
-#
-#
-#     # VX.  Analyze the data ---------------------------------------------------
-#
-#     for (i in 1:length(years.use)){
-#         # a. Subset the data according to year, colID, rowID, state, country, etc.x
-#         birdData <- birdsData %>%
-#             filter(year == years.use[i]) %>%
-#             dplyr::rename(variable = aou,
-#                           value = stoptotal)
-#
-#
-#
-#         if (nrow(birdData) == 0){
-#             next
-#         }
-#
-#         # b. Munge the data further
-#         birdData <- mungeSubsetData(birdData)
-#
-#
-#         # X.   Calculate the metrics ---------------------------------------------------
-#         ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
-#
-#         suppressMessages(calculateMetrics(dataIn = birdData, metrics.to.calc = metrics.to.calc, yearInd = years.use[i]))
-#
-#         print(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
-#
-#     } # end i-loop
-#
-#     print(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
-# } # end j-loop
-#
-#
+## About 5 minutes run time for all transects in one direction!
+for (j in 1:length(dir.use)) {
+    # For east-west analysis
+        if (direction == "East-West"){
+            birdsData <- feathers %>%
+                filter(rowID == dir.use[j]) %>%
+                mutate(direction = direction,
+                       dirID = dir.use[j])
+    }
+    # For south-north analysis
+        if (direction == "South-North"){
+            birdsData <- feathers %>%
+            filter(colID == dir.use[j]) %>%
+            mutate(direction = direction,
+                   dirID = dir.use[j])
+    }
+
+
+
+    if (nrow(birdsData) < min.samp.sites) {
+        next(print(paste0("Not enough data to analyze. Skipping j-loop ", dir.use[j])))
+    }
+
+
+    # VX.  Analyze the data ---------------------------------------------------
+
+    for (i in 1:length(years.use)){
+        # a. Subset the data according to year, colID, rowID, state, country, etc.x
+        birdData <- birdsData %>%
+            filter(year == years.use[i]) %>%
+            dplyr::rename(variable = aou,
+                          value = stoptotal)
+
+
+
+        if (nrow(birdData) == 0){
+            next
+        }
+
+        # b. Munge the data further
+        birdData <- mungeSubsetData(birdData)
+
+
+        # X.   Calculate the metrics ---------------------------------------------------
+        ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
+
+        suppressMessages(calculateMetrics(dataIn = birdData, metrics.to.calc = metrics.to.calc, yearInd = years.use[i]))
+
+        print(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
+
+    } # end i-loop
+
+    print(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
+} # end j-loop
+
+
 
 ################ PART V: VISUALIZE THE METRICS  #########################################################
 # XI.   Import results --------------------------------------------------------

@@ -14,6 +14,7 @@
 #' @param RouteTypeID One or more numbers indicating route substrate (1=roadside;2=water;3=off-road; Default = 1, roadside only).
 #' @param Stratum A vector of BBS physiographic stratum codes by which to filter the routes.
 #' @param BCR A vector of Bird Conservation Region codes where by which to filter the routes.
+#' @param file The name of the zipfile to be downloaded from dir
 #' @return A dataframe
 #' @export
 #'
