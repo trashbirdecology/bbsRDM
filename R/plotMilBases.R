@@ -10,7 +10,7 @@ sp::proj4string(milBases) <-
 
 
 # Extract the CELL ID in which each military base falls.
-temp <- merge(plotResults, milBases)
+temp <- merge(routes_grid, milBases)
 str(temp)
 
 
