@@ -4,11 +4,13 @@
 #' @param bbLat Min and max (in any order) latitude coordinates for the bounding box. The function removes routes (lat,long) falling outside these coordinates.  Default = c(23, 51). See also 'bbLong'.
 #' @param bbLong Min and max (in any order) longitude for the bounding box. The function removes routes (lat,long) falling outside these coordinates. Default = c(23, 51). See also 'bbLat'.
 #' @export createSamplingGrid
+#' @param country One or more of c("CA","USA"). If not specified, will keep grid based on both CA and USA.
 #' @usage routes_gridList <- createSamplingGrid(cs = c(1,1))
 #' @examples
 #' @keywords bbs, routes
 
-createSamplingGrid <- function(cs,  bbLat = c(51, 23) , bbLong =  c(-52, -128)){
+createSamplingGrid <- function(cs,  bbLat = c(51, 23) , bbLong =  c(-52, -128),
+                               country = c("CA","USA")){
   # A: BBS Routes ------------------------------------------------------------
 
   # Load the BBS routes information and location
@@ -26,6 +28,15 @@ createSamplingGrid <- function(cs,  bbLat = c(51, 23) , bbLong =  c(-52, -128)){
       longitude < max(bbLong),
       longitude > min(bbLong)
     )
+
+  # If user wants to analyse more CA and USA, they will need to specify in country arg
+  if( "USA" %in% country){
+      routes <-routes %>% filter(countrynum == 840)
+  }
+  if( "CA" %in% country){
+      routes <- routes %>% filter(countrynum == 124)
+  }
+
 
   # Set coordinates for route locations
   sp::coordinates(routes) <- ~ longitude + latitude
