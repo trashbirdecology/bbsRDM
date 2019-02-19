@@ -105,8 +105,8 @@ createSamplingGrid <-
         # This looks a little messy (columnnames) but for now leave it to match sp_grd
         rowcol_ID <-
             as.data.frame(cbind(
-                ID = gather(as_tibble(row_m), value = "rowID")$rowID,
-                colID = gather(as_tibble(col_m), value = "colID")$colID
+                ID = tidyr::gather(as_tibble(row_m), value = "rowID")$rowID,
+                colID = tidyr::gather(as_tibble(col_m), value = "colID")$colID
             ))
 
 
