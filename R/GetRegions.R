@@ -2,6 +2,7 @@
 #' @export GetRegions
 #' @param Dir location of the BBS files. Do not change unless they make major changes.
 #' @param bbsDir Location of the folder containing bbs raw data (defined in runthrough.rmd)
+#' @export
 GetRegions <-
     function(Dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
              ZipFiles = TRUE) {

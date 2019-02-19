@@ -3,7 +3,7 @@
 #' @param bbsData The input bbsData.
 #' @param funMass The funMass list (from `funcMass()`).
 #' @param printMissing Logical. Prints to screen the missing species.
-#' @export funcMass
+#' @export
 
 mergeFunMassBBS <- function(bbsData, funMass, printMissing = T){
 

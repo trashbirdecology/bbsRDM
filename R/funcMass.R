@@ -3,7 +3,7 @@
 #' @param dataWD Where the functional trait and mass dataframes are stored.
 #' @param fxn Logical. Retrieves functional trait data (referece).
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
-#' @export funcMass
+#' @export
 
 funcMass <- function(dataWD = paste0(getwd(), "/data"), fxn = T, mass = F){
 

@@ -3,6 +3,7 @@
 #' @param results A data frame or list element with columns 'time', 'metricType', and 'metricValue' for either the EWS or Distance results.
 #' @param resultsDir Where to save the feather.
 #' @param metricInd One of 'distances' or 'ews'. Used in outfile name.
+#' @export
 
 
 saveMyResults <- function(results,

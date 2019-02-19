@@ -1,3 +1,5 @@
+#' @description sets a plotting theme for plots
+#' @export
 myTheme <- function() {
 
 # Define cb-friendly ramp -------------------------------------------------

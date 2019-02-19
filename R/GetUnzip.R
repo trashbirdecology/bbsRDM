@@ -5,7 +5,7 @@
 #' @details Used internally. If ZipName begins with 'http' or 'ftp', then download and unzip to
 #'   Filename and return as a dataframe. Otherwise, unzip Zipname and return as a data.frame.
 #' @return A dataframe
-
+#' @export
 GetUnzip <- function(ZipName, FileName) {
     if (grepl('^[hf]t+p', ZipName)) {
         temp <- tempfile()

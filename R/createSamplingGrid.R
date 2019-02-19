@@ -3,11 +3,11 @@
 #' @param cs Cell size (in degree lat, long). Default is 0.5 degree long by 0.5 degree lat. In this region, 1 deg latitude ~= 69 miles & 1 deg longitude ~= 55 miles. The total length of a BBS route is ~50 miles. Caution when using degrees < 1 by 1 degree as a single route could fal into multiple cells...
 #' @param bbLat Min and max (in any order) latitude coordinates for the bounding box. The function removes routes (lat,long) falling outside these coordinates.  Default = c(23, 51). See also 'bbLong'.
 #' @param bbLong Min and max (in any order) longitude for the bounding box. The function removes routes (lat,long) falling outside these coordinates. Default = c(23, 51). See also 'bbLat'.
-#' @export createSamplingGrid
 #' @param country One or more of c("CA","USA"). If not specified, will keep grid based on both CA and USA.
 #' @usage routes_gridList <- createSamplingGrid(cs = c(1,1))
 #' @examples
 #' @keywords bbs, routes
+#' @export
 
 createSamplingGrid <- function(cs,  bbLat = c(51, 23) , bbLong =  c(-52, -128),
                                country = c("CA","USA")){

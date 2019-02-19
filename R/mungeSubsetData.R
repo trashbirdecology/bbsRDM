@@ -1,18 +1,21 @@
-mungeSubsetData <- function(birdData){
+#' @description munge the subbsetted data
+#' @param df
+#' @export
+mungeSubsetData <- function(df){
 
 if(direction == "East-West"){
-    birdData <- birdData %>%
+    df <- df %>%
         dplyr::rename(sortVar = long)
 
 
 }
 if(direction == "South-North"){
-    birdData <- birdData %>%
+    df <- df %>%
         dplyr::rename(sortVar = lat)
 }
 
 
-birdData <- birdData %>%
+birdData <- df %>%
    # sum over species/sites to account for hybrid and UNID races
     dplyr::group_by(sortVar, cellID, direction, dirID, variable,year) %>%
     summarise(value = sum(value)) %>%
@@ -20,5 +23,7 @@ birdData <- birdData %>%
     # need to arrange by time to make sure the distances are calculated correctly!
     arrange(variable, sortVar) %>%
     ungroup()
+
+return(birdData)
 
 }

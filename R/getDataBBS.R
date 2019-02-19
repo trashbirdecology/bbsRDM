@@ -7,7 +7,6 @@
 #' @param aou Vector of AOU #s Default = NULL (all species).
 #' @param countrynum Vector of country ID #'s. Default = NULL (all countryNums).
 #' @param states Vector of state names Default = NULL (all states).
-#' @export
 #'
 #' @return If download successful, a dataframe with the results.
 #'
@@ -17,6 +16,8 @@
 #' \dontrun{
 #' NE <- getDataBBS(file = "Nebrask.zip")
 #' }
+#'
+#' @export
 #'
 getDataBBS <- function(file = file,
                        dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",
