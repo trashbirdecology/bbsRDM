@@ -1,7 +1,7 @@
 
 #' @export sort.year.line
 #' @title Plot a single transect over multiple years, with one metricTYpe.
-#'
+#' @export
 # Single line plot of one transect, multiple years, one metric ------------
 sort.year.line <-
     function(df,
