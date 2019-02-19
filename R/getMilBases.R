@@ -1,6 +1,5 @@
 # Download, unzip and import shapefile of U.S. military installations
 #' @title Get military installation shapefile from online data repo and save to
-#' @description
 #' @param shploc URL location for.zip file
 #' @param shpfile Name of the file to upload
 #' @return shp A shapefile with points designating U.S. military bases.

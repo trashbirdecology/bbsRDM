@@ -1,13 +1,6 @@
-#' @description
-#' @param df
-#' @param metric.ind
-#' @param year.ind
-#' @param dirID.ind
-#' @param direction
-#' @param scale
-#' @param center
-#' @param
+
 #' @export sort.year.line
+#' @title Plot a single transect over multiple years, with one metricTYpe.
 #'
 # Single line plot of one transect, multiple years, one metric ------------
 sort.year.line <-

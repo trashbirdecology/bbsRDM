@@ -6,6 +6,9 @@
 \usage{
 mungeSubsetData(df)
 }
+\arguments{
+\item{df}{A data frame}
+}
 \description{
 munge the subbsetted data
 }

@@ -5,7 +5,7 @@
 #' @param bbLong Min and max (in any order) longitude for the bounding box. The function removes routes (lat,long) falling outside these coordinates. Default = c(23, 51). See also 'bbLat'.
 #' @param country One or more of c("CA","USA"). If not specified, will keep grid based on both CA and USA.
 #' @usage routes_gridList <- createSamplingGrid(cs = c(1,1))
-#' @examples
+
 #' @keywords bbs, routes
 #' @export createSamplingGrid
 

@@ -1,7 +1,8 @@
 #' @description munge the subbsetted data
 #' @title Munge the subsetting data
-#' @param df
+#' @param df A data frame
 #' @export mungeSubsetData
+#'
 mungeSubsetData <- function(df){
 
 if(direction == "East-West"){

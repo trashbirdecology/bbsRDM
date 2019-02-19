@@ -6,8 +6,6 @@
 #' @param direction Direction of the analysis (South-North or East-West)
 #' @export calculateMetrics
 #'
-#' @example
-
 calculateMetrics <-
     function(dataIn,
              metrics.to.calc = c("distances", "ews"),
