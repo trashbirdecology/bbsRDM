@@ -7,7 +7,8 @@
 #' @export getMilBases
 #' @example milBases <- getMilBases(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/installations_ranges.zip", shpfile = "MIRTA_Points")
 
-getMilBases <-  function(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/installations_ranges.zip", shpfile = "MIRTA_Points") {
+getMilBases <-  function(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/installations_ranges.zip",
+                         shpfile = "MIRTA_Points") {
     temp = tempfile()
     download.file(shploc, temp)
     exdir = tempdir()
