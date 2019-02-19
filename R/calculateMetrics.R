@@ -4,7 +4,8 @@
 #' @param dataIn data frame with columns: sortVar (the sorting variable; latitude or longitude),  cellID (cell ID for the spatial grid),  variable (species),  value (count data).
 #' @param min.samp.sites Minimum number of unique sites in the transect (or unique times along the time series) required to analyze the data. Most metrics can be calculated using three data points, although we do not nrecommend this.
 #' @param direction Direction of the analysis (South-North or East-West)
-#' @export
+#' @export calculateMetrics
+#'
 #' @example
 
 calculateMetrics <-

@@ -17,7 +17,7 @@
 #' NE <- getDataBBS(file = "Nebrask.zip")
 #' }
 #'
-#' @export
+#' @export getDataBBS
 #'
 getDataBBS <- function(file = file,
                        dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",

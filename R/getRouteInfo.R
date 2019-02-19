@@ -15,7 +15,7 @@
 #' RouteInfo <- getRouteInfo()
 #' }
 #'
-#' @export
+#' @export getRouteInfo
 
 getRouteInfo <- function(routesFile = "routes.zip",
                          routesDir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",

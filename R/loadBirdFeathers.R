@@ -2,7 +2,7 @@
 #' @title Load the BBS data feathers into R.
 #' @param newDir Where the BBS feathers are saved.
 #' @param filename Name of the feather filename (e.g., 'arizona.zip' or 'arizona'). This function will replace .zip with .feather when necessary.
-#' @export
+#' @export loadBirdFeathers
 
 loadBirdFeathers <- function(newDir, filename) {
 

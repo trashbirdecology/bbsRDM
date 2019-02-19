@@ -7,7 +7,7 @@
 #' @usage routes_gridList <- createSamplingGrid(cs = c(1,1))
 #' @examples
 #' @keywords bbs, routes
-#' @export
+#' @export createSamplingGrid
 
 createSamplingGrid <- function(cs,  bbLat = c(51, 23) , bbLong =  c(-52, -128),
                                country = c("CA","USA")){

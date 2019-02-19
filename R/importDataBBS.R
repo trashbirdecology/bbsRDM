@@ -16,9 +16,7 @@
 #' @param BCR A vector of Bird Conservation Region codes where by which to filter the routes.
 #' @param file The name of the zipfile to be downloaded from dir
 #' @return A dataframe
-#' @export
-#'
-#'
+#' @export importDataBBS
 
 importDataBBS <- function(
                           # getDataBBS

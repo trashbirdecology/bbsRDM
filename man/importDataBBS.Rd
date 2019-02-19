@@ -10,6 +10,8 @@ importDataBBS(file, dir, year = NULL, aou = NULL, countrynum = NULL,
   RouteTypeID = 1, Stratum = NULL, BCR = NULL)
 }
 \arguments{
+\item{file}{The name of the zipfile to be downloaded from dir}
+
 \item{dir}{http:// pr ftp:/ link to bbs data location (here: state files)}
 
 \item{year}{Vector of years. Default = NULL (all years).}

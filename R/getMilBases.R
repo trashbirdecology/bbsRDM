@@ -4,8 +4,7 @@
 #' @param shploc URL location for.zip file
 #' @param shpfile Name of the file to upload
 #' @return shp A shapefile with points designating U.S. military bases.
-#' @export
-#' @example milBases <- getMilBases(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/installations_ranges.zip", shpfile = "MIRTA_Points")
+#' @export getMilBases
 
 getMilBases <-  function(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/installations_ranges.zip",
                          shpfile = "MIRTA_Points") {

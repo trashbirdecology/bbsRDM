@@ -2,7 +2,7 @@
 #' @title Subset the BBS data by species, functional traits, and/or body mass.
 #' @param subset.by One or more of 'remove.fowl' (removes waterfowl), "remove.shorebirds" (removes shorebirds and waders),  'remove.shoreWaderFowl' (removes shorebirds, waders, and fowl).
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
-#' @export
+#' @export subsetByAOU
 
 
 subsetByAOU <- function(myData, subset.by = c( 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl')){

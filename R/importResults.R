@@ -6,7 +6,7 @@
 #'   for visualization?
 #' @param subset.by One or more strings of patterns by which to import the data. Can be used to import South-North transects only (subset.by = "South-North"), or to import all within a single year (subset.by == "year1987"). Default = NULL will import all files in the directory.
 #' @return A dataframe
-#' @export
+#' @export importResults
 
 importResults <- function(resultsDir, myPattern, subset.by = NULL) {
     results <- NULL

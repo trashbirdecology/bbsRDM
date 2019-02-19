@@ -12,6 +12,8 @@ routes_gridList <- createSamplingGrid(cs = c(1,1))
 \item{bbLat}{Min and max (in any order) latitude coordinates for the bounding box. The function removes routes (lat,long) falling outside these coordinates.  Default = c(23, 51). See also 'bbLong'.}
 
 \item{bbLong}{Min and max (in any order) longitude for the bounding box. The function removes routes (lat,long) falling outside these coordinates. Default = c(23, 51). See also 'bbLat'.}
+
+\item{country}{One or more of c("CA","USA"). If not specified, will keep grid based on both CA and USA.}
 }
 \description{
 Creates a sampling grid across the continental united states and assign BBS routes to specific a row and column ID.

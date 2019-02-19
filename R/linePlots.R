@@ -7,7 +7,7 @@
 #' @param scale
 #' @param center
 #' @param
-#' @export
+#' @export sort.year.line
 #'
 # Single line plot of one transect, multiple years, one metric ------------
 sort.year.line <-

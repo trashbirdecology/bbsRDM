@@ -1,5 +1,6 @@
+#' @title Plotting themes for BBS RDM
 #' @description sets a plotting theme for plots
-#' @export
+#' @export myTheme
 myTheme <- function() {
 
 # Define cb-friendly ramp -------------------------------------------------
