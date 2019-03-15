@@ -20,7 +20,9 @@ importResults <- function(resultsDir, myPattern, subset.by = NULL) {
 feather = list()
     for(i in 1:length(files) ){
 
+
         feather[[i]] <- read_feather(path = paste0(resultsDir, "/", myPattern,"/", files[i]))
+
 
             }
 
