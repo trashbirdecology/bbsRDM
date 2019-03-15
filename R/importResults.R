@@ -53,7 +53,8 @@ importResults <-
                 metricType = as.factor(metricType),
                 direction = as.factor(direction),
                 year = as.factor(year)
-            )
+            ) %>%
+            distinct(dirID, year, metricType, metricValue, analysis, .keep_all = TRUE)
 
 
         return(results)

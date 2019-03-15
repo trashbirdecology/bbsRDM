@@ -5,7 +5,7 @@
 \title{Plot a single transect over multiple years, with one metricTYpe.}
 \usage{
 \method{sort}{year.line}(df, metric.ind, year.ind, dirID.ind, direction,
-  scale = T, center = T)
+  scale = TRUE, center = TRUE, min.data = 5)
 }
 \description{
 Plot a single transect over multiple years, with one metricTYpe.

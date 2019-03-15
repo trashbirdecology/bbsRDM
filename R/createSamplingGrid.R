@@ -11,8 +11,8 @@
 
 createSamplingGrid <-
     function(cs = c(0.5, 0.5),
-             bbLat = c(51, 23) ,
-             bbLong =  c(-52,-128),
+             bbLat = c(53, 26) ,
+             bbLong =  c(-62, -128),
              country = c("CA", "USA")) {
         # A: BBS Routes ------------------------------------------------------------
 

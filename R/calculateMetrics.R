@@ -92,7 +92,7 @@ calculateMetrics <-
                     metricInd = metricInd
                 )
 
-                rm(results)
+                return(results)
             }
         } # leave EWS calculations
 

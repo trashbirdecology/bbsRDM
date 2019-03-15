@@ -4,14 +4,17 @@
 \alias{importResults}
 \title{Load the regime detection metric results (.feathers)}
 \usage{
-importResults(resultsDir, myPattern, subset.by = NULL)
+importResults(resultsDir, myPattern, subset.by = NULL,
+  metrics.keep = NULL)
 }
 \arguments{
 \item{resultsDir}{Where the results are stored.}
 
 \item{myPattern}{Pattern for loading results files. Name of the subdirectory  ("distances", "ews").}
 
-\item{subset.by}{One or more strings of patterns by which to import the data. Can be used to import South-North transects only (subset.by = "South-North"), or to import all within a single year (subset.by == "year1987"). Default = NULL will import all files in the directory.}
+\item{subset.by}{One or more  patterns by which to filter file names for import the data. Can be used to import South-North transects only (subset.by = "South-North"), or to import all within a single year (subset.by == "year1987"). Default = NULL will import all files in the directory. Multiple example = c("1979","South-North")}
+
+\item{metrics.keep}{If specified will keep only the metrics specified.}
 }
 \value{
 A dataframe

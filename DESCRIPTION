@@ -19,7 +19,8 @@ Depends:
     feather, 
     kedd,
     devtools, 
-    caTools
+    caTools, 
+    glue
 Imports:
 RoxygenNote: 6.1.1
 Suggests: 
