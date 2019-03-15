@@ -1,7 +1,5 @@
-
 #' @export sort.year.line
 #' @title Plot a single transect over multiple years, with one metricTYpe.
-#' @export
 # Single line plot of one transect, multiple years, one metric ------------
 sort.year.line <-
     function(df,
@@ -9,9 +7,10 @@ sort.year.line <-
              year.ind,
              dirID.ind,
              direction,
-             scale = T,
-             center = T) {
-        sortVar.lab <-
+             scale = TRUE,
+             center = TRUE, min.data = 5) {
+
+        if(!exists('sortVar.lab')) sortVar.lab <-
             ifelse( direction == "South-North",
                    "latitude",
                    "longitude")
@@ -22,17 +21,17 @@ sort.year.line <-
                    dirID %in% dirID.ind ,
                    direction == direction)
 
-        if (scale == T | center == T) {
+        if (scale == TRUE | center == TRUE) {
             data <-
                 data %>% group_by(metricType, dirID, year) %>%
                 mutate(metricValue = base::scale(metricValue, center = center, scale = scale)) %>%
                 ungroup()
-            if (scale == T & center == T) {
+            if (scale == TRUE & center == TRUE) {
                 print("Data were z-scored.")
             }
-            if (scale == T & center == F)
+            if (scale == TRUE & center == FALSE)
                 print("Data were mean-centered.")
-            if (scale == F & center == T)
+            if (scale == FALSE & center == TRUE)
                 print("Data were 0-1 scaled.")
 
         }

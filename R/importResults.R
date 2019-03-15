@@ -17,18 +17,15 @@ importResults <- function(resultsDir, myPattern, subset.by = NULL) {
             }
 
     print(paste0("I am importing " , length(files) , " files. Does this sound right?!"))
-
+feather = list()
     for(i in 1:length(files) ){
 
-        feather = NULL
-
-        feather <-read_feather(path = paste0(resultsDir, "/", myPattern,"/", files[i]))
-
-        results = rbind(feather, results)
+        feather[[i]] <- read_feather(path = paste0(resultsDir, "/", myPattern,"/", files[i]))
 
             }
 
 
+    results <- bind_rows(feather)
     results <- results %>% mutate(analysis = as.factor(myPattern)) %>%
         mutate(metricType = as.factor(metricType),
                direction = as.factor(direction),
