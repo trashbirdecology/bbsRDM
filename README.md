@@ -10,11 +10,11 @@ Install the development version from [GitHub](https://github.com/) with:
 # install.packages("devtools")
 devtools::install_github("TrashBirdEcology/bbsRDM")
 ```
-## Example
+## Example (in dev) PLEASE SEE VIGNETTES
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example using Nebraska data. 
 
 ``` r
-NE <- getDataBBS("Nebrask.zip") # downloads a zip file and returns it as a data.frame
+NE <- getDataBBS("Nebrask.zip") # downloads a zip file and returns it as a data.frame. This is NOT a typo.
 ```
 Use `r GetRegions()` to find the zip file names of a particular state (USA) or province (Canada). 
