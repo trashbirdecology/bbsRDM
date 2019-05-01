@@ -7,7 +7,8 @@
 #'
 GetRegions <-
     function(Dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
-             ZipFiles = TRUE) {
+             ZipFiles = TRUE, 
+            bbsDir = here::here("/bbsData/") {
         # Code to use if following section is buggy.. -----------------------------
 
         # If the functiin doesn't work properly,  use this.
