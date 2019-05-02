@@ -7,9 +7,13 @@
 #'
 GetRegions <-
     function(Dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
-             ZipFiles = TRUE) {
+             ZipFiles = TRUE, 
+            bbsDir = NULL) {
         # Code to use if following section is buggy.. -----------------------------
-
+        if(is.null(bbsDir)) {
+            bbsDir <- here::here("bbsData")
+            dir.create(bbsDir)
+        } # end bbsDir creation             
         # If the functiin doesn't work properly,  use this.
         File <- paste0(Dir, "RegionCodes.txt")
         newDir <- paste0(bbsDir, "/codes")

@@ -1,4 +1,6 @@
 # bbsRDM
+Vignette and example under dev
+
 
 The goal of bbsRDM is to download BBS data from the USGS's FTP server, and calculate various regime detection metrics. 
 
