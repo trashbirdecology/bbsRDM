@@ -19,13 +19,14 @@
 #'
 #' @export getDataBBS
 #'
-getDataBBS <- function(file = file,
+getDataBBS <- function(file,
                        dir =  "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",
                        year = NULL,
                        aou = NULL,
                        countrynum = NULL,
                        states = NULL) {
   # Unzip the the state file(s)
+
   dat <-
     GetUnzip(ZipName = paste0(dir, file),
              FileName = gsub("^Fifty", "fifty", gsub("zip", "csv", file)))
@@ -33,39 +34,25 @@ getDataBBS <- function(file = file,
   names(dat) <- tolower(names(dat))
 
   ## Define subsetting parameters
-  {
-    if (is.null(countrynum)) {
-      UseCountry <-
-        TRUE
-    } else {
-      UseCountry <- dat$countrynum %in% countrynum
-    }
-    if (is.null(year)) {
-      UseYear <- TRUE
-    } else {
-      UseYear <- dat$year %in% year
-    }
-    if (is.null(aou)) {
-      UseAOU <- TRUE
-    } else {
-      UseAOU <- dat$aou %in% aou
-    }
-    if (is.null(states)) {
-      UseState <- TRUE
-    } else {
-      UseState <- dat$statenum %in% states
-    }
-  }
+    if(!is.null(countrynum)) dat <- dat %>%
+         filter(countrynum %in% countrynum)
 
-  ## Create a vector based on this
-  Use <-
-    UseYear & UseAOU & UseCountry & UseState
+  if(!is.null(year)) dat <- dat %>%
+      filter(year %in% year)
 
-  if (sum(Use) > 0) {
+  if(!is.null(aou)) dat <- dat %>%
+      filter(AOU %in% aou)
+
+  if(!is.null(states)) dat <- dat %>%
+      filter(statenum %in% states)
+
+
+
+  if (nrow(dat) > 0) {
     dat$routeID <-
       paste(dat$statenum, dat[, grep("^[Rr]oute$", names(dat))])
 
-  dat <- subset(dat, subset = Use)
+    dat <- subset(dat, subset = Use)
 
     return(dat)
   } else
