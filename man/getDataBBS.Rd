@@ -4,7 +4,7 @@
 \alias{getDataBBS}
 \title{Download USGS Breeding Bird Survey data}
 \usage{
-getDataBBS(file = file,
+getDataBBS(file,
   dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/States/",
   year = NULL, aou = NULL, countrynum = NULL, states = NULL)
 }

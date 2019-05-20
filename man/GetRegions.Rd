@@ -6,7 +6,7 @@
 \usage{
 
   GetRegions(Dir = "ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/",
-  ZipFiles = TRUE)
+  ZipFiles = TRUE, bbsDir = NULL)
 }
 \arguments{
 \item{Dir}{location of the BBS files. Do not change unless they make major changes.}
