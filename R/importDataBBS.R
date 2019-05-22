@@ -35,6 +35,7 @@ importDataBBS <- function(
   ){
 
     # Download and munge the Species List from BBS
+      ## this aou code is downloaded from the BBS server..
     aous <- GetSpNames()
 
     # Fix scientific name
