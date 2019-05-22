@@ -8,7 +8,7 @@
 #' @export subsetByAOU
 
 subsetByAOU <- function(myData, subset.by = c( 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl'), 
-                       aou.ind = NULL, order.ind = NULL
+                       aou.ind = NULL, order.ind = NULL, fam.ind = NULL
                        ){
     # subset.by =c("keep.diurnal", 'remove.fowl', "remove.shorebirds", "  'remove.shoreWaderFowl')
 
