@@ -10,15 +10,11 @@
 subsetByAOU <- function(myData, subset.by = NULL, 
                        aou.ind = NULL, order.ind = NULL, fam.ind = NULL
                        ){
-    # subset.by =c("keep.diurnal", 'remove.fowl', "remove.shorebirds", "  'remove.shoreWaderFowl')
 
 ## The AOU species codes can be found at [the BBS FTP site]("ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/SpeciesList.txt").
 
- #    if("keep.diurnal" %in% subset.by){
- #        myData <- myData %>%
- # ## HERE-- need to add species codes for owls. nightjars, etc.
- #    }
-
+  
+  ## Will update to remove by families and orders for the remove.fowl etc...
     if("remove.fowl" %in% subset.by){
         myData <- myData %>%
             filter(!aou %in% c(1290:1780))
