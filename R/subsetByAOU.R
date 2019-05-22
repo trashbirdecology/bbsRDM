@@ -1,7 +1,7 @@
 #' @param myData A data frame including the column "aou".
 #' @title Subset the BBS data by species, functional traits, and/or body mass. Default is null. 
 #' @param subset.by One or more of 'remove.fowl' (removes waterfowl), "remove.shorebirds" (removes shorebirds and waders),  'remove.shoreWaderFowl' (removes shorebirds, waders, and fowl).
-#' @param mass Logical. Retrieves body mass information (Dunning reference).
+# NEED TO INCLUDE @param mass Logical. Retrieves body mass information (Dunning reference).
 #' @param aou.ind Numeric or vector of numeric values of the AOU codes. These are the species you want to REMOVE from analysis.
 #' @param order.ind Character or vector of characters of taxonomic orders to remove
 #' @param fam.ind Character or vector of characters of taxonomic family to remove
