@@ -2,11 +2,13 @@
 #' @title Subset the BBS data by species, functional traits, and/or body mass.
 #' @param subset.by One or more of 'remove.fowl' (removes waterfowl), "remove.shorebirds" (removes shorebirds and waders),  'remove.shoreWaderFowl' (removes shorebirds, waders, and fowl).
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
-#' @param aou.codes Numeric or vector of numeric values of the AOU codes. These are the species you want to REMOVE from analysis.
+#' @param aou.ind Numeric or vector of numeric values of the AOU codes. These are the species you want to REMOVE from analysis.
+#' @param order.ind Character or vector of characters of taxonomic orders to remove
+#' @param fam.ind Character or vector of characters of taxonomic family to remove
 #' @export subsetByAOU
 
 subsetByAOU <- function(myData, subset.by = c( 'remove.fowl', "remove.shorebirds",  'remove.shoreWaderFowl'), 
-                       aou = NULL
+                       aou.ind = NULL, order.ind = NULL
                        ){
     # subset.by =c("keep.diurnal", 'remove.fowl', "remove.shorebirds", "  'remove.shoreWaderFowl')
 
@@ -32,11 +34,25 @@ subsetByAOU <- function(myData, subset.by = c( 'remove.fowl', "remove.shorebirds
             filter(!aou %in% c(0000:2880))
     }
 
-    
-    ## Subset by AOU specific numbers. 
-     if(!is.null(aou.codes)){
+  
+
+      ## Subset by taxonomic families
+     if(!is.null(fam.ind)){
         myData <- myData %>%
-            filter(!aou %in% aou.codes)
+            filter(!order %in% fam.ind)
+    }
+
+
+  ## Subset by taxonomic order
+     if(!is.null(order.ind)){
+        myData <- myData %>%
+            filter(!order %in% order.ind)
+    }
+  
+    ## Subset by AOU specific numbers. 
+     if(!is.null(aou.ind)){
+        myData <- myData %>%
+            filter(!aou %in% aou.ind)
     }
 
     return(myData)
