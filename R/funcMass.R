@@ -5,7 +5,7 @@
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
 #' @export funcMass
 
-funcMass <- function(dataWD = paste0(getwd(), "/data"), fxn = TRUE, mass = TRE){
+funcMass <- function(dataWD = paste0(getwd(), "/data"), fxn = TRUE, mass = TRUE){
 
 # Load  data -----------------------------------------------------------
 fun <- NULL
