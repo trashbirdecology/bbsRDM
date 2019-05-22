@@ -5,16 +5,16 @@
 #' @param mass Logical. Retrieves body mass information (Dunning reference).
 #' @export funcMass
 
-funcMass <- function(dataWD = paste0(getwd(), "/data"), fxn = T, mass = F){
+funcMass <- function(dataWD = paste0(getwd(), "/data"), fxn = TRUE, mass = TRE){
 
 # Load  data -----------------------------------------------------------
-
+fun <- NULL
 
 # Functional groups (from LCTA):
-if(fxn == T){
+if(fxn ){
     func <- suppressMessages(suppressWarnings(readr::read_csv(paste(dataWD, "/foraging_data_LCTA.csv", sep = ""))))}else(fxn= NULL)
 
-if(mass==T){
+if(mass){
 # Body mass (Dunning 2008):
 mass <- suppressMessages(suppressWarnings(readr::read_csv(paste(dataWD, "/bird.mass.dunning4.csv", sep = "")))) %>%
   dplyr::select(-X13)
