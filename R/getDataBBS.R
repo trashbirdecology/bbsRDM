@@ -52,7 +52,7 @@ getDataBBS <- function(file,
     dat$routeID <-
       paste(dat$statenum, dat[, grep("^[Rr]oute$", names(dat))])
 
-    dat <- subset(dat, subset = Use)
+    # dat <- subset(dat, subset = Use) ## NOT SURE WHAT THIS IS
 
     return(dat)
   } else
