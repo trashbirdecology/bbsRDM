@@ -1,8 +1,9 @@
 # bbsRDM
-Vignette and example under dev
-
 
 The goal of bbsRDM is to download BBS data from the USGS's FTP server, and calculate various regime detection metrics. 
+
+
+*PLEASE NOTE: most BBS related functions have been transferred to [trashbirdecology/bbsAssistant](github.com/trashbirdecology/bbsAssistant). This repository will be archived once all spatial aspects of this package have been transferred there.*
 
 ## Installation
 
