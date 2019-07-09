@@ -2,12 +2,15 @@
 title: "An example of how to use the package to calculate and visualize multiple regime detection metrics using BBS data: spatial application"
 author: "Jessica Burnett"
 date: "`r Sys.Date()`"
-output: rmarkdown::html_vignette
-vignette: >
-  %\VignetteIndexEntry{Vignette Title}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+output: pdf_document
+#output: rmarkdown::html_vignette
+#vignette: >
+#  %\VignetteIndexEntry{Vignette Title}
+#  %\VignetteEngine{knitr::rmarkdown}
+#  %\VignetteEncoding{UTF-8}
 ---
+
+# bbsRDM: A Package for Calculating Regime Detection Measures on the North American Breeding Bird Survey Data
 
 This vignette runs through the capabilites of the bbsRDM package, which relies on the package `trashbirdecology::regimeDetectionMeasures`. Although this package can be used to calculate and visualize BBS data using time series, the  example at hand runs presents an application to spatial transects. 
 
@@ -22,11 +25,12 @@ knitr::opts_chunk$set(
 
 # Load packages & create local directories
 
-There are a lot of dependencies to load. 
+There are a lot of dependencies to load!
 
-```{r , message=FALSE, warning = FALSE, cache=T}
-## Re-install often as this package is under major development.
-devtools::install_github("trashbirdecology/regimedetectionmeasures", force = T)
+```{r , message=FALSE, warning = FALSE, cache=TRUE, echo=FA:SE}
+# Reinstall these often (using force=TRUE) while under development.
+devtools::install_github("trashbirdecology/bbsRDM", force = FALSE, dependencies = TRUE)
+devtools::install_github("trashbirdecology/regimedetectionmeasures", force = FALSE, dependencies = TRUE)
 library(regimeDetectionMeasures)
 library(sp)
 library(raster)
@@ -36,7 +40,7 @@ library(here)
 ```
 
 Create directories to locally store BBS data and results.
-```{r  createDirs, warning=T, }
+```{r  createDirs, warning=TRUE, }
 # a. Create a directory to store and/or load the BBS data as feathers
 bbsDir <- here::here("bbs_raw_data")
     # If the bbs data already exists inside bbsDir, then we will create a logical to NOT download it (see below)

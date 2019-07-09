@@ -2,7 +2,7 @@
 % Please edit documentation in R/importDataBBS.R
 \name{importDataBBS}
 \alias{importDataBBS}
-\title{Download and merge all the count, route, and species information}
+\title{A wrapper function for downloading raw data, filtering by species names/AOU codes, and merging with route information.}
 \usage{
 importDataBBS(file, dir, year = NULL, aou = NULL, countrynum = NULL,
   states = NULL, routesFile = "routes.zip",
@@ -42,5 +42,5 @@ importDataBBS(file, dir, year = NULL, aou = NULL, countrynum = NULL,
 A dataframe
 }
 \description{
-This function was adapted from **oharar/rBBS** package.
+Some parts of this function were borrowed from **oharar/rBBS**.
 }

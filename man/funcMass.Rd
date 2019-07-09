@@ -4,7 +4,7 @@
 \alias{funcMass}
 \title{Load functional trait and mass data}
 \usage{
-funcMass(dataWD = paste0(getwd(), "/data"), fxn = T, mass = F)
+funcMass(dataWD = paste0(getwd(), "/data"), fxn = TRUE, mass = TRUE)
 }
 \arguments{
 \item{dataWD}{Where the functional trait and mass dataframes are stored.}

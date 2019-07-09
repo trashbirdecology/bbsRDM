@@ -15,7 +15,7 @@ getDataBBS(file,
 
 \item{year}{Vector of years. Default = NULL (all years).}
 
-\item{aou}{Vector of AOU #s Default = NULL (all species).}
+\item{aou}{Vector of AOU numeric codes. Default = NULL (all species). (For species list visit the BBS [FTP site]("ftp://ftpext.usgs.gov/pub/er/md/laurel/BBS/DataFiles/SpeciesList.txt").}
 
 \item{countrynum}{Vector of country ID #'s. Default = NULL (all countryNums).}
 

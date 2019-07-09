@@ -2,18 +2,22 @@
 % Please edit documentation in R/subsetByAOU.R
 \name{subsetByAOU}
 \alias{subsetByAOU}
-\title{Subset the BBS data by species, functional traits, and/or body mass.}
+\title{Subset the BBS data by species, functional traits, and/or body mass. Default is null.}
 \usage{
-subsetByAOU(myData, subset.by = c("remove.fowl", "remove.shorebirds",
-  "remove.shoreWaderFowl"))
+subsetByAOU(myData, subset.by = NULL, aou.ind = NULL,
+  order.ind = NULL, fam.ind = NULL)
 }
 \arguments{
 \item{myData}{A data frame including the column "aou".}
 
 \item{subset.by}{One or more of 'remove.fowl' (removes waterfowl), "remove.shorebirds" (removes shorebirds and waders),  'remove.shoreWaderFowl' (removes shorebirds, waders, and fowl).}
 
-\item{mass}{Logical. Retrieves body mass information (Dunning reference).}
+\item{aou.ind}{Numeric or vector of numeric values of the AOU codes. These are the species you want to REMOVE from analysis.}
+
+\item{order.ind}{Character or vector of characters of taxonomic orders to remove}
+
+\item{fam.ind}{Character or vector of characters of taxonomic family to remove}
 }
 \description{
-Subset the BBS data by species, functional traits, and/or body mass.
+Subset the BBS data by species, functional traits, and/or body mass. Default is null.
 }
