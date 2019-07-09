@@ -1,5 +1,5 @@
 ---
-title: "An example of how to use the package to calculate and visualize multiple regime detection metrics using BBS data: spatial application"
+title: "bbsRDM: A Package for Calculating Regime Detection Measures on the N. American Breeding Bird Survey Data"
 author: "Jessica Burnett"
 date: "`r Sys.Date()`"
 output: pdf_document
@@ -10,27 +10,28 @@ output: pdf_document
 #  %\VignetteEncoding{UTF-8}
 ---
 
-# bbsRDM: A Package for Calculating Regime Detection Measures on the North American Breeding Bird Survey Data
+# Overview 
 
-This vignette runs through the capabilites of the bbsRDM package, which relies on the package `trashbirdecology::regimeDetectionMeasures`. Although this package can be used to calculate and visualize BBS data using time series, the  example at hand runs presents an application to spatial transects. 
+This document briefly reviews the functionality of `bbsRDM`. Although this package can be used to calculate and visualize BBS data using time series, the example at hand  presents an application to large spatial transects across the continental United States.  
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>", 
-  eval=T, echo=F, 
-  cache = T, warning=F, message=F
+  eval=TRUE, 
+  include=FALSE
 )
 ```
 
-# Load packages & create local directories
-
-There are a lot of dependencies to load!
+First, install the `bbsRDM` and `regimeDetectionMeasures` packages from GitHub.
 
 ```{r , message=FALSE, warning = FALSE, cache=TRUE, echo=FA:SE}
 # Reinstall these often (using force=TRUE) while under development.
 devtools::install_github("trashbirdecology/bbsRDM", force = FALSE, dependencies = TRUE)
 devtools::install_github("trashbirdecology/regimedetectionmeasures", force = FALSE, dependencies = TRUE)
+```
+
+```{r}
 library(regimeDetectionMeasures)
 library(sp)
 library(raster)
@@ -39,8 +40,9 @@ library(bbsRDM)
 library(here)
 ```
 
-Create directories to locally store BBS data and results.
-```{r  createDirs, warning=TRUE, }
+Next, create diretories for storing the BBS and results locally (if directories exist, this BBS data will __not__ be downloaded (unless you specify 'downloadBBSData=TRUE'), however, the __results will be overwritten__!).
+
+```{r , echo=TRUE, createDirs, warning=TRUE}
 # a. Create a directory to store and/or load the BBS data as feathers
 bbsDir <- here::here("bbs_raw_data")
     # If the bbs data already exists inside bbsDir, then we will create a logical to NOT download it (see below)
@@ -49,14 +51,11 @@ bbsDir <- here::here("bbs_raw_data")
         }else(
             {dir.create(bbsDir)
             downloadBBSData = TRUE}
-            )
-
-# If this returns a warning, proceed with caution as directory already exists, and results WILL be OVERRIDDEN.
+            ) # If this returns a warning, proceed with caution as directory already exists, and results WILL be OVERRIDDEN.
 
 # b. Create a directory to store and/or load the BBS data as feathers
 resultsDir <- here::here("myResults")
 dir.create(resultsDir)
-# ditto
 
 # c. Create directory for storing early warning signal results
 resultsDirEWS <- here::here("myResults/ews")
@@ -67,12 +66,12 @@ resultsDirDIST <- here::here("myResults/distances")
 dir.create(resultsDirDIST)
 ```
 
-# Download the BBS data and save to file locally
-If necessary, download all the state data. This takes 10-15 minutes, so only run if you have not recently downloaded the BBS data. 
+# Retrieve the BBS Data and Save Locally 
+If necessary, download all the state data. Downloading the entire BBS data takes a while, so only run if you have not recently downloaded the BBS data.  If you only need a subset of the data, please see the documentation for `bbsAssistant::get_regions` and `bbsRDM::getDataBBS`.
 
-```{r getBBSdata, message=F, warning=F}
+```{r getBBSdata}
 # a. Load the regional .txt file from Patuxent's FTP server (you must be connected to the internet to perform this step)
-regions <- GetRegions()
+regions <- bbsAssistant::get_regions()
 
 # b. Create a series or one filenames for states, regions
 regionFileName <- regions$zipFileName %>% na.omit()
@@ -109,7 +108,8 @@ rm(bbsData)
 ```
 
 # Create the sampling grid 
-Next we build the sampling grid to force route information onto a regular grid.
+
+Next we build a spatial sampling grid for aligning BBS data to regularly spaced cells. This is important for spatial interpretation of the regime detection metric results.
 
 ```{r samplingGrid, eval = T, message=F, warning = F, echo=F}
 # III: Build sampling grid --------------------------------------------------------
