@@ -3,51 +3,49 @@ title: "bbsRDM: A Package for Calculating Regime Detection Measures on the N. Am
 author: "Jessica Burnett"
 date: "`r Sys.Date()`"
 output: pdf_document
-#output: rmarkdown::html_vignette
-#vignette: >
-#  %\VignetteIndexEntry{Vignette Title}
-#  %\VignetteEngine{knitr::rmarkdown}
-#  %\VignetteEncoding{UTF-8}
 ---
 
 # Setup and Overview 
 
-This document briefly reviews the functionality of `bbsRDM`. Although this package can be used to calculate and visualize BBS data using time series, the example at hand  presents an application to large spatial transects across the continental United States.  
+This document briefly reviews the functionality of __bbsRDM__. Although this package can be used to calculate and visualize BBS data using time series, the example at hand  presents an application to large spatial transects across the continental United States.  
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>", 
+  # comment = "#>", 
   eval=TRUE, 
   include=FALSE, 
-  cache.path = "cache/",
-  cache=TRUE, 
-  warning=FALSE, message=FALSE,
-  fig.width="50%"
+  # cache.path = "cache/",
+  cache=TRUE,
+  warning=FALSE, 
+  message=FALSE
 )
-ggplot2::theme_set(theme_bw())
+
+load("runthrough.RData")
 ```
 
-First, install the `bbsRDM` and `regimeDetectionMeasures` packages from GitHub.
+First, install the bbsRDM and regimeDetectionMeasures packages from GitHub.
 
-```{r , message=FALSE, warning = FALSE, cache=TRUE, echo=FA:SE}
+```{r installs}
 # Reinstall these often (using force=TRUE) while under development.
 devtools::install_github("trashbirdecology/bbsRDM", force = FALSE, dependencies = TRUE)
 devtools::install_github("trashbirdecology/regimedetectionmeasures", force = FALSE, dependencies = TRUE)
 ```
 
-```{r}
+```{r libs}
+library(bbsRDM)
 library(regimeDetectionMeasures)
 library(sp)
 library(raster)
 library(feather)
-library(bbsRDM)
 library(here)
+library(ggplot2)
+ggplot2::theme_set(theme_bw())
 ```
 
 Next, create diretories for storing the BBS and results locally (if directories exist, this BBS data will __not__ be downloaded (unless you specify 'downloadBBSData=TRUE'), however, the __results will be overwritten__!).
 
-```{r , echo=TRUE, createDirs, warning=TRUE}
+```{r createDirs, echo=TRUE, warning=TRUE}
 # a. Create a directory to store and/or load the BBS data as feathers
 bbsDir <- here::here("bbs_raw_data")
     # If the bbs data already exists inside bbsDir, then we will create a logical to NOT download it (see below)
@@ -74,7 +72,7 @@ dir.create(resultsDirDIST)
 # Retrieve the BBS Data and Save Locally 
 If necessary, download all the state data. Downloading the entire BBS data takes a while, so only run if you have not recently downloaded the BBS data.  If you only need a subset of the data, please see the documentation for `bbsAssistant::get_regions` and `bbsRDM::getDataBBS`.
 
-```{r getBBSdata}
+```{r getBBSdata, echo=TRUE}
 # a. Load the regional .txt file from Patuxent's FTP server (you must be connected to the internet to perform this step)
 regions <- bbsAssistant::get_regions()
 
@@ -115,8 +113,7 @@ rm(bbsData)
 # Create a Spatial Sampling Grid Across North America   
 
 Next we build a spatial sampling grid for aligning BBS data to regularly spaced cells. This is important for spatial interpretation of the regime detection metric results.
-```{r samplingGrid, eval = T, message=F, warning = F, echo=F}
-# III: Build sampling grid --------------------------------------------------------
+```{r samplingGrid, eval = TRUE,message=F, warning = F, echo=TRUE}
 # Define the grid's cell size (lat, long; unit:degrees)
         ## 1 deg latitude ~= 69 miles
         ## 1 deg longitude ~= 55 miles
@@ -125,15 +122,10 @@ cs <-
 
 # Create the grid
 routes_gridList <- createSamplingGrid(cs = cs)
-
-# Define the components of the sampling grid as individual objects
-routes_grid <- routes_gridList$routes_grid
-sp_grd <- routes_gridList$sp_grd
-rm(cs)
 ```
 
 Now we load in the BBS data from the feathers we created and align with the sampling grid. This requires a bit of memory, proceed with caution. 
-```{r, eval = T, message=F, warning = F, echo=F}
+```{r loadbbs, echo=FALSE}
 feathers <- NULL
 featherNames <- list.files(bbsDir, pattern = ".feather")
 featherNames <- str_c("/", featherNames) #add separator
@@ -145,7 +137,7 @@ for (i in 1:length(featherNames)) {
   feather <- feather %>%
     dplyr::rename(lat = latitude,
                   long = longitude) %>%
-    left_join(routes_grid, by = c("countrynum", "statenum", "route", "lat", "long"))
+    left_join(routes_gridList$routes_grid, by = c("countrynum", "statenum", "route", "lat", "long"))
   
   feathers <- rbind(feathers, feather)
   rm(feather)
@@ -159,14 +151,14 @@ Although subsetting the species is optional, this package contains features for 
 Subset species according to AOU species codes (i.e. by family, genera, etc..)  
 For this example we will remove shorebirds, wading birds, and waterfowl (i.e., AOU species' codes 0000:2880). *See `R/subsetByAOU.R` source code or documentation for options (see: `subset.by`)
 
-```{r subsetAOU, eval = T, message = T, warning = F }
+```{r subsetAOU, eval = FALSE, echo=TRUE}
 # Subset the species
 feathers <- subsetByAOU(myData = feathers, subset.by= 'remove.shoreWaderFowl')
 ```
 
 ## Subset species according to functional traits (or body mass). 
-**Note: eval = F**
-```{r subsetFxn, eval = TRUE, echo=TRUE}
+**Note: eval = FALSE**...change to true if you wish to evaluate in rmd knitting.
+```{r subsetFxn, eval = FALSE, echo=TRUE}
 # Load the functional trait and mass data, and merge the mass and functional datasets into a single list. 
 funMass <-
     funcMass(dataWD = here::here("data/"),
@@ -178,14 +170,12 @@ funMass <-
 # Combine the functional trqits and/or body mass
 bbsData <-
     mergeFunMassBBS(bbsData = feathers[1:1e3,], funMass = funMass)
-
-
 ```
 
 # Calculate regime detection metrics across space or time
 
 ## First, define the parameters required to calcualte the metrics. 
-```{r defineParams, eval = T, warning=T, message=F}
+```{r defineParams, eval = TRUE}
 # Which metrics do you want to calculate?
 metrics.to.calc <- c("distances", "ews")
 
@@ -233,7 +223,10 @@ years.use  <- years.use[which(years.use %% T == 0 & years.use > 1975)] %>% sort(
 ## Conduct analysis!
 This section will loop through `years.use` and `dir.use`, running each BBS route (temooral analysis) or spatial transect by year (spatial analysis) at a time. Results are saved in directories created in \@ref(#createDirs) . **Please note: depending on the # of years and # spatial transects, this could take a while!** 
 <!-- For this exmaple, we will restrict our analysis to half of the North-South-running transects. -->
-```{r calcMetrics, eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE}
+```{r calcMetrics, eval=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
+##############################################################################
+### NOTE: change eval=TRUE if the results are not yet stored in file.
+##############################################################################
 for (j in 1:(length(dir.use))) {
     # For east-west analysis
         if (direction == "East-West"){
@@ -293,24 +286,23 @@ for (j in 1:(length(dir.use))) {
 
 First, import and combine the results as created in \@ref(#calcMetrics)
 This chunk will import the EWS results and the distance results separately, combining each into their own data frames. 
-```{r importCalcMetrics, message=F, warning=F, echo=F}
+```{r importCalcMetrics, echo=FALSE}
 #  Import EWS results
 results_ews <-
     importResults(resultsDir = resultsDir, myPattern = 'ews',
                   subset.by = direction) %>%
     mutate(cellID = cellID_max)     # assign the end of the window as the cellID
-glimpse(results_ews)
+# glimpse(results_ews)
 ## FYI: rows will likely be absent when metricTypes = c(FI, VI), because FI and VI are calculated across multiple variables (species), rather than calculated for individual variables.
 
 #  Import distance results
 results_dist <-
     importResults(resultsDir = resultsDir, myPattern = 'distances', subset.by = direction)
-
-glimpse(results_dist)
+# glimpse(results_dist)
 ```
 
 Next, get the results to align with our sampling grid for visualizing results across space.
-```{r , eval=T , message=F, warning=F, echo=F}
+```{r makegrid}
 #  Get the spatial sampling grid coordinates
 coords_grd <-
     cbind(routes_gridList$sp_grd@data,
@@ -343,13 +335,10 @@ sp::proj4string(results_dist) <-
 
 # Visualize results: one regime detection metric at a time
 First, specify plotting parameters. We can visualize either the distance results (`results_dist`) or the early-warning signal results (`results_ews`). For this example we will visualize the distance results. 
-```{r , eval = TRUE}
+```{r subsetresults, eval = TRUE}
 # Define the results we want to visualize:
 # Specify results to visualize
 plotResults <- results_dist
-
-# Which metric do we want to visualize
-metric.ind <- "s"
 
 # Sort the years
 (year.ind <- unique(plotResults@data$year) %>% sort())
@@ -362,34 +351,112 @@ metric.ind <- "s"
 ```
 
 
-Plot the distance travelled, *s* for transect # 13:
+Plot the distance travelled, *s* for transect # 13. This measure indicates how quickly the multivariable system is moving through phase space. Notice that the absolute value of _s_ increases over time. This is unsurprising given that the number of species in BBS censuses has increased over time. The importance of this phenomenon should be evaluated at the local scale.  
 ```{r }
 # Specify the transect # we want to see
 dirID.ind <- 13
-
 metric.ind <- "s"
-
-p.s <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T)
-    # +
-    # # place a v-line at the location of Fort Riley Military base
-    #  geom_vline(aes(xintercept=-96.8), color = "grey", linetype = 2)
-p.s
+# build plot
+(p.s <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T))
 ```
 
 
-Plot the velocity of the distance travelled, *dsdt* for transect # 13:
+Plot the velocity of the distance travelled, *dsdt* for transect # 13. Rapid changes in the velocity of the distance travelled indicates rapid species turnover, or large changes in the abundances of a few species. The ecological significance of rapid change in community abundances, or among the state variables used to calculate distance travelled and velocity, should be evaluated at local and sub-regional scales. 
 ```{r }
-
 # Specify the transect # we want to see
 dirID.ind <- 13
-
 metric.ind <- "dsdt"
-
-p.dsdt <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T)
-    # +
-    # # place a v-line at the location of Fort Riley Military base
-    #  geom_vline(aes(xintercept=-96.8), color = "grey", linetype = 2)
-p.dsdt
+(p.dsdt <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T))
 ```
 
 
+# Military Bases 
+Use function `getMilBases()` to retrieve MIRTA military base point shapefiles:
+```{r milbase, echo=TRUE}
+# get military bases shapefile
+milBases <- getMilBases() # defaults will download the MIRTA FY 2018 points
+# Set projection to WGS84 lat long friendly
+sp::proj4string(milBases) <-
+    sp::CRS("+proj=longlat +datum=WGS84")
+```
+
+Next, we need to assign the row and column ID numbers from our sampling grid to each base location, such that we can visualize the results of the regime detection measures within our spatial sampling grid.
+```{r milbase2, echo=TRUE}
+# Extract the CELL ID in which each military base falls.
+milBases.df <- milBases %>% as.data.frame() %>% 
+    rename(long = coords.x1, lat = coords.x2) 
+milBases.df$cellID <-  milBases %over%  routes_gridList$sp_grd 
+
+# remove bases outside our sampling grid
+milBases.df <- milBases.df %>% filter(!is.na(cellID))
+```
+
+```{r}
+ggplot(milBases.df, aes(long, lat, color = COMPONENT))+ geom_point()+
+    ggtitle("Military Bases in the Continental U.S.")
+```
+
+Plot the distance travelled across the entire range
+```{r plots}
+library(viridis)
+temp <- as.data.frame(plotResults) %>%
+    filter(
+        year %in% c(1980, 1990, 2000, 2010),
+           metricType == "s") %>%
+    group_by(dirID, year, analysis) %>%
+    mutate(scaledMetricValue.bycol = base::scale(metricValue, center =T, scale = T)) %>%
+    ungroup() %>%
+    na.omit(metricValue)
+
+ggplot(temp) + geom_raster(aes(x = long, y = lat, fill = scaledMetricValue.bycol)) +
+    coord_fixed(ratio = 1) +
+    scale_fill_viridis(direction = -1) +
+    facet_wrap(~year, strip.position = "top", nrow=2) +
+    theme(legend.position = "none")
+```
+
+
+Plot the velocity of the distance travelled across the entire range
+```{r plotdsdt}
+library(viridis)
+temp <- as.data.frame(plotResults) %>%
+    filter(year %in% c(1980, 1990, 2000, 2010),
+           metricType == "dsdt") %>%
+    group_by(dirID, year) %>%
+    mutate(logmetric = log(metricValue)) %>% 
+    mutate(scaledMetricValue.bycol = base::scale(logmetric, center =T, scale = T)) %>%
+    ungroup() %>%
+    na.omit(metricValue)
+
+ggplot(temp) + geom_raster(aes(x = long, y = lat, fill = scaledMetricValue.bycol)) +
+    coord_fixed(ratio = 1) +
+    scale_fill_viridis(direction = -1) +
+    facet_wrap(~year, strip.position = "top", nrow=2) +
+    theme(legend.position = "none")
+```
+
+
+Plot the change in ds/dt over time
+```{r plotd_dsdt}
+t <- as.data.frame(plotResults) %>%
+    filter(year %in% c(1980, 1990, 2000, 2010),
+           metricType == "s") %>%
+    group_by(dirID, year, analysis) %>%
+    mutate(scaledMetricValue.bycol = base::scale(metricValue, center =T, scale = T)) %>%
+    ungroup() %>%
+    group_by(metricType, cellID) %>%
+    arrange(year) %>%
+    mutate(dScaledMetricValue.bycol = scaledMetricValue.bycol - lag(scaledMetricValue.bycol))
+
+ggplot() + geom_raster(data = test_data2, aes(x = long, y = lat, fill = dScaledMetricValue.bycol)) +
+    coord_fixed(ratio = 1) +
+    scale_fill_viridis(direction = -1) +
+    facet_wrap(~year,  strip.position = "top") +
+    theme(legend.position = "none")+
+    geom_point(data = milBases)
+```
+
+
+```{r saverdata}
+save.image("runthrough.RData")
+```
