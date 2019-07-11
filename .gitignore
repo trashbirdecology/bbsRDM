@@ -2,8 +2,8 @@
 .Rhistory
 /bbs_raw_data
 myResults
-*.pdf
-*.md
+
+.md
 *.html
 
 
@@ -11,8 +11,6 @@ myResults
 bbsData/codes/README.txt
 bbsData/codes/RegionCodes.txt
 otherScripts/.DS_Store
-
-
 
 /vignettes/runthrough_cache/
 /vignettes/runthrough_files/
