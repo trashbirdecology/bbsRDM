@@ -71,7 +71,6 @@ calculateMetrics <-
                 rdm_window_analysis(
                     dataInRDM = dataInRDM,
                     winMove = winMove,
-                    overrideSiteErr = F,
                     fi.equation = fi.equation,
                     min.window.dat = min.window.dat,
                     fill = fill,

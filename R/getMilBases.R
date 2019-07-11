@@ -12,12 +12,11 @@ getMilBases <-  function(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/in
     exdir = tempdir()
     unzip(temp, exdir = exdir)
 
-    # list.files(exdir) ## sometimes teh shp names change, so use this to check to make sure shpfile is specified correctly
+    list.files(exdir) ## sometimes teh shp names change, so use this to check to make sure shpfile is specified correctly
 
-    shp <- rgdal::readOGR(exdir, shpfile)[1]
+    shp <- rgdal::readOGR(exdir, shpfile)#[1]
 
-
-    return(shp)
+        return(shp)
 
         }
 
