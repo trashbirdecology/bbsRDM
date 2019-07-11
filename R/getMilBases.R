@@ -6,13 +6,16 @@
 #' @export getMilBases
 
 getMilBases <-  function(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/installations_ranges.zip",
-                         shpfile = "MIRTA_Points") {
+                         shpfile = "FY18_MIRTA_Points") {
     temp = tempfile()
     download.file(shploc, temp)
     exdir = tempdir()
     unzip(temp, exdir = exdir)
 
-    shp = rgdal::readOGR(exdir, shpfile)[1]
+    # list.files(exdir) ## sometimes teh shp names change, so use this to check to make sure shpfile is specified correctly
+
+    shp <- rgdal::readOGR(exdir, shpfile)[1]
+
 
     return(shp)
 
