@@ -10,7 +10,7 @@ output: pdf_document
 #  %\VignetteEncoding{UTF-8}
 ---
 
-# Overview 
+# Setup and Overview 
 
 This document briefly reviews the functionality of `bbsRDM`. Although this package can be used to calculate and visualize BBS data using time series, the example at hand  presents an application to large spatial transects across the continental United States.  
 
@@ -19,8 +19,13 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>", 
   eval=TRUE, 
-  include=FALSE
+  include=FALSE, 
+  cache.path = "cache/",
+  cache=TRUE, 
+  warning=FALSE, message=FALSE,
+  fig.width="50%"
 )
+ggplot2::theme_set(theme_bw())
 ```
 
 First, install the `bbsRDM` and `regimeDetectionMeasures` packages from GitHub.
@@ -104,13 +109,12 @@ birdsToFeathers(dataIn  = bbsData,
 # e. Clear object from memory
 rm(bbsData)
 } # end section I. loop
-}else(message(paste0("NOT DOWNLOADING BBS DATA. If you wish to download the BBS data, please remove files from directory: ",bbsDir))) # end if-else to download the data
+}else((paste0("NOT DOWNLOADING BBS DATA. If you wish to download the BBS data, please remove files from directory: ",bbsDir))) # end if-else to download the data
 ```
 
-# Create the sampling grid 
+# Create a Spatial Sampling Grid Across North America   
 
 Next we build a spatial sampling grid for aligning BBS data to regularly spaced cells. This is important for spatial interpretation of the regime detection metric results.
-
 ```{r samplingGrid, eval = T, message=F, warning = F, echo=F}
 # III: Build sampling grid --------------------------------------------------------
 # Define the grid's cell size (lat, long; unit:degrees)
@@ -125,13 +129,10 @@ routes_gridList <- createSamplingGrid(cs = cs)
 # Define the components of the sampling grid as individual objects
 routes_grid <- routes_gridList$routes_grid
 sp_grd <- routes_gridList$sp_grd
-
 rm(cs)
-
 ```
 
-Now we load in the BBS data from the feathers we created and align with the sampling grid. This requires a bit of memory, proceed with caution.
-
+Now we load in the BBS data from the feathers we created and align with the sampling grid. This requires a bit of memory, proceed with caution. 
 ```{r, eval = T, message=F, warning = F, echo=F}
 feathers <- NULL
 featherNames <- list.files(bbsDir, pattern = ".feather")
@@ -152,10 +153,10 @@ for (i in 1:length(featherNames)) {
 }
 ```
 
-# Next, we can subset the BBS data by species and/or functional traits (OPTIONAL but recommended)
-Although subsetting the speices is optional, I recommend removing waterfowl, wading birds, and shorebirds from analyses, especially as the spatial extent of the analysis increases. 
+# Subset the BBS data by species or location (*OPTIONAL*) 
+Although subsetting the species is optional, this package contains features for subsetting by AOU code, functional groups, or by spatial location (e.g. remove all Montana observaitons). 
 
-## Subset species according to AOU species codes (i.e. by family, genera, etc..)  
+Subset species according to AOU species codes (i.e. by family, genera, etc..)  
 For this example we will remove shorebirds, wading birds, and waterfowl (i.e., AOU species' codes 0000:2880). *See `R/subsetByAOU.R` source code or documentation for options (see: `subset.by`)
 
 ```{r subsetAOU, eval = T, message = T, warning = F }
@@ -164,19 +165,20 @@ feathers <- subsetByAOU(myData = feathers, subset.by= 'remove.shoreWaderFowl')
 ```
 
 ## Subset species according to functional traits (or body mass). 
-### **Note: eval = F**
-```{r subsetFxn, eval =F, message = T, warning = F}
-# Load the functional trait and mass data, and munge/merge
+**Note: eval = F**
+```{r subsetFxn, eval = TRUE, echo=TRUE}
+# Load the functional trait and mass data, and merge the mass and functional datasets into a single list. 
 funMass <-
-    funcMass(dataWD = paste0(getwd(), "/data"),
-             fxn = T, # get functional trait data?
-             mass = F) # get body mass data?
+    funcMass(dataWD = here::here("data/"),
+             fxn = TRUE, # get functional trait data?
+             mass = TRUE) # get body mass data?
+# str(funMass$fxn[1:5]) # check out the first 5 columns of funMass$fxn
+# str(funMass$mass[1:5]) # check out the first 5 columns of funMass$fxn
 
 # Combine the functional trqits and/or body mass
 bbsData <-
-    mergeFunMassBBS(bbsData = feather, funMass = funMass)
+    mergeFunMassBBS(bbsData = feathers[1:1e3,], funMass = funMass)
 
-rm(funMass)
 
 ```
 
@@ -211,16 +213,14 @@ fi.equation = "7.12"
 winMove = 0.25
 
 # Define some filtering and labeling parameters based on direction of spatial analysis (if applicable)
-
 if (direction == "South-North") {
     dir.use =  unique(feathers$colID) %>% na.omit(colID) %>% sort()}
 if (direction == "East-West") {
     dir.use = unique(feathers$rowID) %>% na.omit(rowID) %>% sort()}
-
 ```
 
 ## Define the years we want to analyze
-For this (spatial) example, we will analyze only every fifth year 
+For this (spatial) example, we will analyze only every tenth year 
 ```{r yearSubset, echo=FALSE, message=FALSE, paged.print=TRUE}
 # Get all possible years
 years.use = unique(feathers$year)
@@ -231,11 +231,10 @@ years.use  <- years.use[which(years.use %% T == 0 & years.use > 1975)] %>% sort(
 ```
 
 ## Conduct analysis!
-This section will loop through `years.use` and `dir.use`, running each BBS route (temooral analysis) or spatial transect by year (spatial analysis) at a time. Results are saved in directories created in \@ref(#createDirs) 
-
-**Note: depending on the # of years and spatial transects, this could take a while!**
-```{r calcMetrics, eval=T}
-for (j in 1:length(dir.use)) {
+This section will loop through `years.use` and `dir.use`, running each BBS route (temooral analysis) or spatial transect by year (spatial analysis) at a time. Results are saved in directories created in \@ref(#createDirs) . **Please note: depending on the # of years and # spatial transects, this could take a while!** 
+<!-- For this exmaple, we will restrict our analysis to half of the North-South-running transects. -->
+```{r calcMetrics, eval=TRUE, message=FALSE, warning=FALSE, cache=TRUE}
+for (j in 1:(length(dir.use))) {
     # For east-west analysis
         if (direction == "East-West"){
             birdsData <- feathers %>%
@@ -282,11 +281,11 @@ for (j in 1:length(dir.use)) {
 # browser()
         calculateMetrics(dataIn = birdData, metrics.to.calc, direction = direction,  yearInd = years.use[i])
 
-        print(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
+        message(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
 
     } # end i-loop
 
-    print(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
+    message(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
 } # end j-loop
 ```
 
@@ -295,19 +294,19 @@ for (j in 1:length(dir.use)) {
 First, import and combine the results as created in \@ref(#calcMetrics)
 This chunk will import the EWS results and the distance results separately, combining each into their own data frames. 
 ```{r importCalcMetrics, message=F, warning=F, echo=F}
-
 #  Import EWS results
 results_ews <-
     importResults(resultsDir = resultsDir, myPattern = 'ews',
                   subset.by = direction) %>%
-    # assign the end of the window as the cellID
-    mutate(cellID = cellID_max)
-
+    mutate(cellID = cellID_max)     # assign the end of the window as the cellID
+glimpse(results_ews)
 ## FYI: rows will likely be absent when metricTypes = c(FI, VI), because FI and VI are calculated across multiple variables (species), rather than calculated for individual variables.
 
 #  Import distance results
 results_dist <-
     importResults(resultsDir = resultsDir, myPattern = 'distances', subset.by = direction)
+
+glimpse(results_dist)
 ```
 
 Next, get the results to align with our sampling grid for visualizing results across space.
@@ -323,64 +322,74 @@ coords_grd <-
 # Join coords_grd with results
 # note: a full join will likely produce many cells with NO results data..
 # but NO lat or long should == NA!
-distResults <-
+results_dist <-
     full_join(coords_grd,
               results_dist) %>%
     na.omit(metricType)
 
-ewsResults <-
+results_ews <-
     full_join(coords_grd,
               results_ews) %>%
     na.omit(metricType) %>%
     dplyr::select(-cellID_min,-cellID_max, -winStart  , -winStop)
 
-# d. Set coordinate system and projection
-coordinates(distResults) <-
-    coordinates(ewsResults) <- c("long", "lat")
-sp::proj4string(distResults) <-
-    sp::proj4string(ewsResults) <-
+# d. Set coordinate system and projection of both results
+coordinates(results_dist) <-
+    coordinates(results_ews) <- c("long", "lat")
+sp::proj4string(results_dist) <-
+    sp::proj4string(results_ews) <-
     sp::CRS("+proj=longlat +datum=WGS84")
-
 ```
 
 # Visualize results: one regime detection metric at a time
-First, specify plotting parameters. 
-
-We can visualize either the distance results (`distResults`) or the early-warning signal results (`ewsResults`).
-
-Define the results we want to visualize:
-```{r , eval = T}
+First, specify plotting parameters. We can visualize either the distance results (`results_dist`) or the early-warning signal results (`results_ews`). For this example we will visualize the distance results. 
+```{r , eval = TRUE}
+# Define the results we want to visualize:
 # Specify results to visualize
-plotResults <- distResults
+plotResults <- results_dist
 
 # Which metric do we want to visualize
 metric.ind <- "s"
 
 # Sort the years
-year.ind <- unique(plotResults@data$year) %>% sort()
+(year.ind <- unique(plotResults@data$year) %>% sort())
 
 # Create a label for plotting, depending on direction
-sortVar.lab <-
+(sortVar.lab <-
     ifelse(unique(plotResults@data$direction) == "South-North",
            "latitude",
-           "longitude")
+           "longitude"))
 ```
 
-Plot individual transects 
-**Note: please specify dirID.ind as desired spatial transect number, and dirInd as direction (E-W or N-S)**
-```{r , echo=F, eval=T, warning=F, message=F}
+
+Plot the distance travelled, *s* for transect # 13:
+```{r }
 # Specify the transect # we want to see
 dirID.ind <- 13
 
 metric.ind <- "s"
 
-
-pl1 <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T)+
-    # place a v-line at the 
-     geom_vline(aes(xintercept=-96.8), color = "grey", linetype = 2)
-pl1
-
+p.s <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T)
+    # +
+    # # place a v-line at the location of Fort Riley Military base
+    #  geom_vline(aes(xintercept=-96.8), color = "grey", linetype = 2)
+p.s
 ```
 
+
+Plot the velocity of the distance travelled, *dsdt* for transect # 13:
+```{r }
+
+# Specify the transect # we want to see
+dirID.ind <- 13
+
+metric.ind <- "dsdt"
+
+p.dsdt <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T)
+    # +
+    # # place a v-line at the location of Fort Riley Military base
+    #  geom_vline(aes(xintercept=-96.8), color = "grey", linetype = 2)
+p.dsdt
+```
 
 

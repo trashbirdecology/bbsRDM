@@ -13,6 +13,9 @@ calculateMetrics <-
              direction,
              yearInd,
              to.calc = c("EWS", "FI", "VI")) {
+
+        library(regimeDetectionMeasures)
+        library(tidyr)
         # Create an id for joining the results with cell ID.
         id <- dataIn %>% dplyr::select(sortVar, cellID, direction, dirID, year) %>% distinct()
 
@@ -33,7 +36,7 @@ calculateMetrics <-
                 # Calc distances
                 results <- NULL
                 results <-
-                    calculate_distanceTravelled(dataInDist, derivs = T) %>%
+                    regimeDetectionMeasures::calculate_distanceTravelled(dataInDist, derivs = TRUE) %>%
                     gather(key = 'metricType', value = 'metricValue', -sortVar, -cellID)
 
 
