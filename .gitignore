@@ -11,3 +11,9 @@ myResults
 bbsData/codes/README.txt
 bbsData/codes/RegionCodes.txt
 otherScripts/.DS_Store
+
+
+
+/vignettes/runthrough_cache/
+/vignettes/runthrough_files/
+/vignettes/runthrough.RData/

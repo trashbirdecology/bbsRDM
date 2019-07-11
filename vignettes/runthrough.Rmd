@@ -1,8 +1,9 @@
 ---
 title: "bbsRDM: A Package for Calculating Regime Detection Measures on the N. American Breeding Bird Survey Data"
-author: "Jessica Burnett"
+# author: "Jessica Burnett"
 date: "`r Sys.Date()`"
-output: pdf_document
+output: 
+    bookdown::pdf_document2
 ---
 
 # Setup and Overview 
@@ -14,25 +15,30 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   # comment = "#>", 
   eval=TRUE, 
-  include=FALSE, 
+  echo=FALSE, 
   # cache.path = "cache/",
   cache=TRUE,
   warning=FALSE, 
-  message=FALSE
+  message=FALSE,
+  out.width="65%", 
+  fig.show=""
 )
 
-load("runthrough.RData")
+options(knitr.graphics.auto_pdf = TRUE)
+
+# load("runthrough.RData")
 ```
 
 First, install the bbsRDM and regimeDetectionMeasures packages from GitHub.
 
-```{r installs}
-# Reinstall these often (using force=TRUE) while under development.
-devtools::install_github("trashbirdecology/bbsRDM", force = FALSE, dependencies = TRUE)
-devtools::install_github("trashbirdecology/regimedetectionmeasures", force = FALSE, dependencies = TRUE)
+```{r installs, echo=TRUE, eval=FALSE}
+devtools::install_github("trashbirdecology/bbsRDM",
+                         force = FALSE, dependencies = FALSE)
+devtools::install_github("trashbirdecology/regimedetectionmeasures",
+                         force = FALSE, dependencies = FALSE)
 ```
 
-```{r libs}
+```{r libs, echo=TRUE}
 library(bbsRDM)
 library(regimeDetectionMeasures)
 library(sp)
@@ -40,40 +46,41 @@ library(raster)
 library(feather)
 library(here)
 library(ggplot2)
+
 ggplot2::theme_set(theme_bw())
 ```
 
 Next, create diretories for storing the BBS and results locally (if directories exist, this BBS data will __not__ be downloaded (unless you specify 'downloadBBSData=TRUE'), however, the __results will be overwritten__!).
 
-```{r createDirs, echo=TRUE, warning=TRUE}
+```{r createDirs, echo=TRUE, warning=FALSE, message=FALSE}
 # a. Create a directory to store and/or load the BBS data as feathers
 bbsDir <- here::here("bbs_raw_data")
-    # If the bbs data already exists inside bbsDir, then we will create a logical to NOT download it (see below)
-        if(length(list.files(bbsDir, pattern = "*.feather")) > 0 ){
-            downloadBBSData = FALSE
-        }else(
-            {dir.create(bbsDir)
-            downloadBBSData = TRUE}
-            ) # If this returns a warning, proceed with caution as directory already exists, and results WILL be OVERRIDDEN.
-
+# If bbsDir is NOT empty then we will NOT download any data.
+if (length(list.files(bbsDir, pattern = "*.feather")) > 0) {
+downloadBBSData = FALSE
+} else
+(
+{
+dir.create(bbsDir)
+downloadBBSData = TRUE
+}
+) # If this returns a warning, proceed with caution as directory already exists, 
+     # results WILL be written over
 # b. Create a directory to store and/or load the BBS data as feathers
 resultsDir <- here::here("myResults")
 dir.create(resultsDir)
-
 # c. Create directory for storing early warning signal results
-resultsDirEWS <- here::here("myResults/ews")
-dir.create(resultsDirEWS)
-
+dir.create(here::here("myResults/ews"))
 # d. Create directory for storing distance travelled results
-resultsDirDIST <- here::here("myResults/distances")
-dir.create(resultsDirDIST)
+dir.create( here::here("myResults/distances"))
 ```
 
 # Retrieve the BBS Data and Save Locally 
 If necessary, download all the state data. Downloading the entire BBS data takes a while, so only run if you have not recently downloaded the BBS data.  If you only need a subset of the data, please see the documentation for `bbsAssistant::get_regions` and `bbsRDM::getDataBBS`.
 
-```{r getBBSdata, echo=TRUE}
-# a. Load the regional .txt file from Patuxent's FTP server (you must be connected to the internet to perform this step)
+```{r getBBSdata, echo=TRUE, message=FALSE}
+# a. Load the regional .txt file from Patuxent's FTP server 
+# (you must be connected to the internet to perform this step)
 regions <- bbsAssistant::get_regions()
 
 # b. Create a series or one filenames for states, regions
@@ -104,10 +111,9 @@ for(i in 1:length(regionFileName)){
 birdsToFeathers(dataIn  = bbsData,
                 newDir  = bbsDir,
                 filename = regionFileName[i])
-# e. Clear object from memory
-rm(bbsData)
-} # end section I. loop
-}else((paste0("NOT DOWNLOADING BBS DATA. If you wish to download the BBS data, please remove files from directory: ",bbsDir))) # end if-else to download the data
+# e. Clear large object from memory
+rm(bbsData)}}
+
 ```
 
 # Create a Spatial Sampling Grid Across North America   
@@ -137,15 +143,17 @@ for (i in 1:length(featherNames)) {
   feather <- feather %>%
     dplyr::rename(lat = latitude,
                   long = longitude) %>%
-    left_join(routes_gridList$routes_grid, by = c("countrynum", "statenum", "route", "lat", "long"))
+    left_join(routes_gridList$routes_grid, 
+              by = c("countrynum", "statenum", "route", "lat", "long"))
   
   feathers <- rbind(feathers, feather)
   rm(feather)
- 
-}
+ }
 ```
 
-# Subset the BBS data by species or location (*OPTIONAL*) 
+#  Subset the BBS data (optional)
+
+## By species (using AOU numbers)
 Although subsetting the species is optional, this package contains features for subsetting by AOU code, functional groups, or by spatial location (e.g. remove all Montana observaitons). 
 
 Subset species according to AOU species codes (i.e. by family, genera, etc..)  
@@ -159,14 +167,11 @@ feathers <- subsetByAOU(myData = feathers, subset.by= 'remove.shoreWaderFowl')
 ## Subset species according to functional traits (or body mass). 
 **Note: eval = FALSE**...change to true if you wish to evaluate in rmd knitting.
 ```{r subsetFxn, eval = FALSE, echo=TRUE}
-# Load the functional trait and mass data, and merge the mass and functional datasets into a single list. 
+# Create a single list of mass and functional traits. 
 funMass <-
     funcMass(dataWD = here::here("data/"),
              fxn = TRUE, # get functional trait data?
              mass = TRUE) # get body mass data?
-# str(funMass$fxn[1:5]) # check out the first 5 columns of funMass$fxn
-# str(funMass$mass[1:5]) # check out the first 5 columns of funMass$fxn
-
 # Combine the functional trqits and/or body mass
 bbsData <-
     mergeFunMassBBS(bbsData = feathers[1:1e3,], funMass = funMass)
@@ -187,13 +192,13 @@ to.calc = c("EWS", "FI", "VI")
 direction <-
     "South-North" # choose one of : 'South-North', 'East-West', or 'temporal'
 
-# Choose the fill value for species present in the entire time series (or sampling transect) but not present on that year. Using "NA" assumes the species with missing data *was not and could not have been present*. Using zero assumes the species could have been present but was not.
+# Choose the fill value as the unobserved value. 
 fill = 0
 
-# Minimum number of sites (if spatial) or years (if temporal)  required to be in the entire sample (trnasect or time series)
+# Minimum number of sites within each transect
 min.samp.sites = 8
 
-# Minimum number of sites (if spatial) or years (if temporal) required to be within a single window 
+# Minimum number of BBS routes within each moving window 
 min.window.dat = 3
 
 # Which Equation of Fisher Information to use (default = 7.12)
@@ -202,7 +207,8 @@ fi.equation = "7.12"
 # By what % of the entire data should the window move? 
 winMove = 0.25
 
-# Define some filtering and labeling parameters based on direction of spatial analysis (if applicable)
+# Define some filtering and labeling parameters based on 
+# direction of spatial analysis  
 if (direction == "South-North") {
     dir.use =  unique(feathers$colID) %>% na.omit(colID) %>% sort()}
 if (direction == "East-West") {
@@ -214,19 +220,21 @@ For this (spatial) example, we will analyze only every tenth year
 ```{r yearSubset, echo=FALSE, message=FALSE, paged.print=TRUE}
 # Get all possible years
 years.use = unique(feathers$year)
-
 # Keep only the years which are divisible by T
 T = 10
 years.use  <- years.use[which(years.use %% T == 0 & years.use > 1975)] %>% sort()
 ```
 
-## Conduct analysis!
-This section will loop through `years.use` and `dir.use`, running each BBS route (temooral analysis) or spatial transect by year (spatial analysis) at a time. Results are saved in directories created in \@ref(#createDirs) . **Please note: depending on the # of years and # spatial transects, this could take a while!** 
+## Calculate Regime Detection Measures Across Spatial Transects
+
+This section will loop through `years.use` and `dir.use`, running each BBS route (temporal analysis) or spatial transect by year (spatial analysis) at a time. Results are saved in directories created in section below. **Please note**: depending on the # of years and # spatial transects, this could take a while. 
+
 <!-- For this exmaple, we will restrict our analysis to half of the North-South-running transects. -->
 ```{r calcMetrics, eval=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
-##############################################################################
-### NOTE: change eval=TRUE if the results are not yet stored in file.
-##############################################################################
+######################################
+### NOTE: change eval=TRUE if the ####
+### results are not yet stored in file.
+######################################
 for (j in 1:(length(dir.use))) {
     # For east-west analysis
         if (direction == "East-West"){
@@ -243,23 +251,19 @@ for (j in 1:(length(dir.use))) {
                    dirID = dir.use[j])
     }
 
-
-
-    if (nrow(birdsData) < min.samp.sites) {
-        next(print(paste0("Not enough data to analyze. Skipping j-loop ", dir.use[j])))
+      if (nrow(birdsData) < min.samp.sites) {
+            next(print(paste0("Not enough data to analyze. 
+                              Skipping j-loop ", dir.use[j])))
     }
 
 
-    # VX.  Analyze the data ---------------------------------------------------
-
+    # Analyze the subset of data
     for (i in 1:length(years.use)){
-        # a. Subset the data according to year, colID, rowID, state, country, etc.x
+        # a. Subset the data 
         birdData <- birdsData %>%
             filter(year == years.use[i]) %>%
             dplyr::rename(variable = aou,
                           value = stoptotal)
-
-
 
         if (nrow(birdData) == 0){
             next
@@ -268,32 +272,29 @@ for (j in 1:(length(dir.use))) {
         # b. Munge the data further
         birdData <- mungeSubsetData(birdData)
 
-
-        # X.   Calculate the metrics ---------------------------------------------------
-        ## This function analyzes the data and writes results to file (in subdirectory 'myResults') as .feather files.
-# browser()
-        calculateMetrics(dataIn = birdData, metrics.to.calc, direction = direction,  yearInd = years.use[i])
-
-        message(paste0("End i-loop (years) ", i, " of ",  length(years.use)))
-
-    } # end i-loop
-
-    message(paste0("End j-loop (transects) ", j, " of ",  length(dir.use)))
-} # end j-loop
+        # c. Calculate metrics
+        calculateMetrics(dataIn = birdData, metrics.to.calc, 
+                         direction = direction,  yearInd = years.use[i])
+        message(paste0("End i-loop (years) ", i, " of ",  
+                       length(years.use)))
+    }  
+    message(paste0("End j-loop (transects) ", j, " of ",  
+                   length(dir.use)))
+}
 ```
 
 # Import and munge the results to prepare for visualization
 
-First, import and combine the results as created in \@ref(#calcMetrics)
-This chunk will import the EWS results and the distance results separately, combining each into their own data frames. 
-```{r importCalcMetrics, echo=FALSE}
+First, use the function 'importResults' to import and combine the results as created in the previous code chunk.  The following chunk chunk will import the EWS results and the distance results separately, combining each into their own data frames.     
+
+```{r importCalcMetrics, echo=FALSE, message=FALSE}
 #  Import EWS results
 results_ews <-
     importResults(resultsDir = resultsDir, myPattern = 'ews',
                   subset.by = direction) %>%
-    mutate(cellID = cellID_max)     # assign the end of the window as the cellID
+# assign the end of the window as the cellID
+    mutate(cellID = cellID_max)     
 # glimpse(results_ews)
-## FYI: rows will likely be absent when metricTypes = c(FI, VI), because FI and VI are calculated across multiple variables (species), rather than calculated for individual variables.
 
 #  Import distance results
 results_dist <-
@@ -325,7 +326,7 @@ results_ews <-
     na.omit(metricType) %>%
     dplyr::select(-cellID_min,-cellID_max, -winStart  , -winStop)
 
-# d. Set coordinate system and projection of both results
+# Set coordinate system and projection of both results
 coordinates(results_dist) <-
     coordinates(results_ews) <- c("long", "lat")
 sp::proj4string(results_dist) <-
@@ -333,26 +334,22 @@ sp::proj4string(results_dist) <-
     sp::CRS("+proj=longlat +datum=WGS84")
 ```
 
-# Visualize results: one regime detection metric at a time
-First, specify plotting parameters. We can visualize either the distance results (`results_dist`) or the early-warning signal results (`results_ews`). For this example we will visualize the distance results. 
+# Visualize Results: Temporally
+
+First, specify plotting parameters (below). We can visualize either the distance results (`results_dist`) or the early-warning signal results (`results_ews`). For this example we will visualize the __distance__ results. 
+
 ```{r subsetresults, eval = TRUE}
-# Define the results we want to visualize:
-# Specify results to visualize
+# Define the results we want to visualize
 plotResults <- results_dist
-
 # Sort the years
-(year.ind <- unique(plotResults@data$year) %>% sort())
-
+year.ind <- unique(plotResults@data$year) %>% sort()
 # Create a label for plotting, depending on direction
-(sortVar.lab <-
-    ifelse(unique(plotResults@data$direction) == "South-North",
+sortVar.lab <-
+    ifelse(unique(plotResults@data$direction)=="South-North",
            "latitude",
-           "longitude"))
+           "longitude")
 ```
-
-
-Plot the distance travelled, *s* for transect # 13. This measure indicates how quickly the multivariable system is moving through phase space. Notice that the absolute value of _s_ increases over time. This is unsurprising given that the number of species in BBS censuses has increased over time. The importance of this phenomenon should be evaluated at the local scale.  
-```{r }
+```{r plots, fig.cap="Distance traveled (s) by the bird community in a single, North-South-running transect."}
 # Specify the transect # we want to see
 dirID.ind <- 13
 metric.ind <- "s"
@@ -360,9 +357,10 @@ metric.ind <- "s"
 (p.s <- sort.year.line(plotResults, metric.ind, year.ind, dirID.ind, dirInd,  scale = T, center = T))
 ```
 
+Plot the distance travelled, *s* for transect # 13 (Figure \@ref(fig:plots)). This measure indicates how quickly the multivariable system is moving through phase space. Notice that the absolute value of _s_ increases over time. This is unsurprising given that the number of species in BBS censuses has increased over time. The importance of this phenomenon should be evaluated at the local scale.  
 
-Plot the velocity of the distance travelled, *dsdt* for transect # 13. Rapid changes in the velocity of the distance travelled indicates rapid species turnover, or large changes in the abundances of a few species. The ecological significance of rapid change in community abundances, or among the state variables used to calculate distance travelled and velocity, should be evaluated at local and sub-regional scales. 
-```{r }
+
+```{r plotdsdt, fig.cap="Velocity (rate of change, dsdt) of the distance travelled by the bird community in a single, North-South-running transect."}
 # Specify the transect # we want to see
 dirID.ind <- 13
 metric.ind <- "dsdt"
@@ -370,34 +368,11 @@ metric.ind <- "dsdt"
 ```
 
 
-# Military Bases 
-Use function `getMilBases()` to retrieve MIRTA military base point shapefiles:
-```{r milbase, echo=TRUE}
-# get military bases shapefile
-milBases <- getMilBases() # defaults will download the MIRTA FY 2018 points
-# Set projection to WGS84 lat long friendly
-sp::proj4string(milBases) <-
-    sp::CRS("+proj=longlat +datum=WGS84")
-```
+Plot the velocity of the distance travelled, *dsdt* for transect # 13 (Figure \@ref(fig:plotdsdt)). Rapid changes in the velocity of the distance travelled indicates rapid species turnover, or large changes in the abundances of a few species. The ecological significance of rapid change in community abundances, or among the state variables used to calculate distance travelled and velocity, should be evaluated at local and sub-regional scales. 
 
-Next, we need to assign the row and column ID numbers from our sampling grid to each base location, such that we can visualize the results of the regime detection measures within our spatial sampling grid.
-```{r milbase2, echo=TRUE}
-# Extract the CELL ID in which each military base falls.
-milBases.df <- milBases %>% as.data.frame() %>% 
-    rename(long = coords.x1, lat = coords.x2) 
-milBases.df$cellID <-  milBases %over%  routes_gridList$sp_grd 
+# Visualize Results: Spatially
 
-# remove bases outside our sampling grid
-milBases.df <- milBases.df %>% filter(!is.na(cellID))
-```
-
-```{r}
-ggplot(milBases.df, aes(long, lat, color = COMPONENT))+ geom_point()+
-    ggtitle("Military Bases in the Continental U.S.")
-```
-
-Plot the distance travelled across the entire range
-```{r plots}
+```{r plotsus, fig.cap="Distance traveled (s) by the bird community across all spatial transects in the sampling grid area."}
 library(viridis)
 temp <- as.data.frame(plotResults) %>%
     filter(
@@ -415,30 +390,31 @@ ggplot(temp) + geom_raster(aes(x = long, y = lat, fill = scaledMetricValue.bycol
     theme(legend.position = "none")
 ```
 
+Plot the distance travelled across the entire range  (Figure \@ref(fig:plotsus)).
 
-Plot the velocity of the distance travelled across the entire range
-```{r plotdsdt}
+
+```{r plotdsdtus, fig.cap = "Rate of change (dsdt) of the distance traveled metric (s) visualized for all spatial transects in our sampling area in the continental U.S."}
 library(viridis)
-temp <- as.data.frame(plotResults) %>%
+temp <- as_tibble(plotResults) %>%
     filter(year %in% c(1980, 1990, 2000, 2010),
            metricType == "dsdt") %>%
     group_by(dirID, year) %>%
     mutate(logmetric = log(metricValue)) %>% 
-    mutate(scaledMetricValue.bycol = base::scale(logmetric, center =T, scale = T)) %>%
-    ungroup() %>%
-    na.omit(metricValue)
+    ungroup()
 
-ggplot(temp) + geom_raster(aes(x = long, y = lat, fill = scaledMetricValue.bycol)) +
+
+ggplot(temp) + geom_raster(aes(x = long, y = lat, fill = logmetric)) +
     coord_fixed(ratio = 1) +
     scale_fill_viridis(direction = -1) +
     facet_wrap(~year, strip.position = "top", nrow=2) +
     theme(legend.position = "none")
 ```
 
+Plot the velocity of the distance travelled across the entire range (Figure \@ref(fig:plotdsdtus)). 
 
-Plot the change in ds/dt over time
-```{r plotd_dsdt}
-t <- as.data.frame(plotResults) %>%
+<!-- Plot the change in ds/dt over time -->
+```{r plotd_dsdt, eval=FALSE, fig.cap="Change in dsdt over time within each spatial transect."}
+t <- as_tibble(plotResults@data) %>%
     filter(year %in% c(1980, 1990, 2000, 2010),
            metricType == "s") %>%
     group_by(dirID, year, analysis) %>%
@@ -448,7 +424,7 @@ t <- as.data.frame(plotResults) %>%
     arrange(year) %>%
     mutate(dScaledMetricValue.bycol = scaledMetricValue.bycol - lag(scaledMetricValue.bycol))
 
-ggplot() + geom_raster(data = test_data2, aes(x = long, y = lat, fill = dScaledMetricValue.bycol)) +
+ggplot() + geom_raster(data = t, aes(x = long, y = lat, fill = dScaledMetricValue.bycol)) +
     coord_fixed(ratio = 1) +
     scale_fill_viridis(direction = -1) +
     facet_wrap(~year,  strip.position = "top") +
@@ -458,5 +434,36 @@ ggplot() + geom_raster(data = test_data2, aes(x = long, y = lat, fill = dScaledM
 
 
 ```{r saverdata}
-save.image("runthrough.RData")
+# save.image("runthrough.RData")
 ```
+
+# Military Bases 
+
+Use the function `getMilBases()` to retrieve MIRTA military base point shapefiles:
+
+```{r milbase, echo=TRUE}
+milBases <- getMilBases() # default arguments will download the MIRTA FY 2018 points
+
+sp::proj4string(milBases) <- 
+    sp::CRS("+proj=longlat +datum=WGS84")# Set projection to WGS84 lat long friendly
+```
+
+Next, we need to assign the row and column ID numbers from our sampling grid to each base location, such that we can visualize the results of the regime detection measures within our spatial sampling grid.
+
+```{r milbase2, echo=TRUE}
+# Extract the CELL ID in which each military base falls.
+milBases.df <- milBases %>% as.data.frame() %>% 
+    rename(long = coords.x1, lat = coords.x2) 
+milBases.df$cellID <-  milBases %over%  routes_gridList$sp_grd 
+
+# remove bases outside our sampling grid
+milBases.df <- milBases.df %>% filter(!is.na(cellID))
+```
+
+
+```{r plotmilbases, fig.cap="Military bases in the sampling area. Points are based on MIRTA FY 2018 military base locations."}
+ggplot(milBases.df, aes(long, lat, color = COMPONENT))+ geom_point()+
+    ggtitle("Military Bases in the Continental U.S.")
+```
+
+Plot the location of military bases (Figure \@ref(fig:plotmilbases)).
