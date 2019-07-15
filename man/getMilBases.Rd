@@ -6,7 +6,7 @@
 \usage{
 
   getMilBases(shploc = "http://www.acq.osd.mil/eie/Downloads/DISDI/installations_ranges.zip",
-  shpfile = "MIRTA_Points")
+  shpfile = "FY18_MIRTA_Points")
 }
 \arguments{
 \item{shploc}{URL location for.zip file}

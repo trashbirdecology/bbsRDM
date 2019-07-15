@@ -4,7 +4,7 @@
 \alias{mergeFunMassBBS}
 \title{Merge functional group and mass data for species with BBS counts}
 \usage{
-mergeFunMassBBS(bbsData, funMass, printMissing = T)
+mergeFunMassBBS(bbsData, funMass, printMissing = TRUE)
 }
 \arguments{
 \item{bbsData}{The input bbsData.}
