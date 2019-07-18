@@ -15,3 +15,11 @@ otherScripts/.DS_Store
 /vignettes/runthrough_cache/
 /vignettes/runthrough_files/
 /vignettes/runthrough.RData/
+vignettes/runthrough.aux
+vignettes/runthrough.knit.md
+vignettes/runthrough.log
+vignettes/runthrough.out
+vignettes/runthrough.pdf
+vignettes/runthrough.tex
+vignettes/runthrough.toc
+vignettes/runthrough.utf8.md
